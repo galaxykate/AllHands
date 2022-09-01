@@ -230,10 +230,15 @@ document.addEventListener("DOMContentLoaded", function(){
 				// Draw
 
 				let recordedFrame = 0
+
 				p.draw = () => {
+					let t = p.millis()*.001
+					let dt = p.deltaTime*.001
 					// Draw whatever the current's drawing is
-					if (this.current.draw)
-						this.current.draw(p)
+					if (this.current.draw) {
+						
+						this.current.draw(p, t, dt)
+					}
 					else {
 						console.warn(`${this.currentID} has no draw fxn`)
 					}
