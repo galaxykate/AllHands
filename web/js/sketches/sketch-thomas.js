@@ -30,15 +30,16 @@ class GameObject {
 	}
 }
 
+const physicsScale = new planck.Vec2(0.6, 0.6);
+
 class PlayerController extends GameObject {	
 	box
 
 	constructor(initX, initY, world) {
-		super(initX, initY)
 		var pl = planck, Vec2 = pl.Vec2;
-		this.world = world
+		super(initX, initY)
 		this.box = world.createBody().setDynamic()
-		this.box.createFixture(pl.Box(0.5, 0.5));
+		this.box.createFixture(pl.Box(25 * physicsScale.x, 25 * physicsScale.y));
 		this.box.setPosition(Vec2(this.x, this.y));
 		this.box.setMassData({ mass : 1, center : Vec2(), I : 1})
 	}
@@ -48,6 +49,34 @@ class PlayerController extends GameObject {
 		this.x = pos.x
 		this.y = pos.y
 	}
+
+	draw(p) {
+		p.strokeWeight(1)
+		p.stroke(100)
+		p.rect(this.x, this.y, 25, 25)
+	}
+}
+
+class Platform extends GameObject {
+	body
+	width
+	height
+
+	constructor(initX, initY, width, height, world) {
+		var pl = planck, Vec2 = pl.Vec2;
+		super(initX, initY)
+		this.width = width
+		this.height = height
+		this.body = world.createBody()
+		this.body.createFixture(pl.Box(width, height))
+		this.body.setPosition(Vec2(this.x, this.y))
+	}
+
+	draw(p) {
+		p.strokeWeight(1)
+		p.stroke(100)
+		p.rect(this.x, this.y, this.width, this.height)
+	}
 }
 
 sketches["thomas"] = {
@@ -56,26 +85,22 @@ sketches["thomas"] = {
 	gameObjects: [],
 	init(p) {
 		console.log("INIT SKETCH", this.id)
-		this.world = planck.World(planck.Vec2(0, 10))
-		player = new PlayerController(50, 50, this.world)
+		this.world = planck.World(planck.Vec2(0, 100))
+		var player = new PlayerController(50, 50, this.world)
 		this.gameObjects.push(player);
+		var platform = new Platform(0, p.height - 100, p.width, 10, this.world)
+		this.gameObjects.push(platform);
 	},
 	draw(p, t, dt) {
 		// Update
 		for(var i = 0; i < this.gameObjects.length; i++)
 			this.gameObjects[i].update(dt)
-		this.world.step(1);
+		this.world.step(dt);
 
 		// Draw
 		p.background(0)
 		for (var i = 0; i < this.gameObjects.length; i++) {
-			p.strokeWeight(1)
-			p.stroke(100)
-			// p.noStroke()
-			// Set the stroke color to be LIGHTER
-			go = this.gameObjects[i];
-			p.rect(go.x, go.y, 10, 10)
+			this.gameObjects[i].draw(p)
 		}
 	}
-
 }
