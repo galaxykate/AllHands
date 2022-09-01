@@ -52,6 +52,7 @@ header,footer {
 }
 
 #main-columns {
+	position: relative;
 	display: flex;
 	flex-direction: row;
 	background-color: white;
@@ -60,8 +61,8 @@ header,footer {
 
 
 
-#main-column {
-	position: absolute;
+.main-column {
+	position: relative;
 	
 	/*margin: 0px auto;*/
 	right: 0px;
@@ -72,7 +73,7 @@ header,footer {
 	
 	display: flex;
 	flex-direction: column;
-	text-align: center;
+	
 }
 
 #debug {
@@ -86,7 +87,7 @@ header,footer {
 */
 
 .p5-holder {
-	
+	position: relative;
 border:  4px solid pink;
 }
 

@@ -128,8 +128,9 @@ document.addEventListener("DOMContentLoaded", function(){
 		template: `<div id="app" >
 			<div class="header">
 					-- meta controls here --
-					<select v-model="current">
-						<option v-for="id in sketchIDs"></option>
+
+					<select v-model="currentID">
+						<option v-for="id in sketchIDs">{{id}}</option>
 					</select>
 			</div>
 
@@ -138,21 +139,34 @@ document.addEventListener("DOMContentLoaded", function(){
 					<div class="p5-holder" ref="p5"></div>
 					<div class="controls" ref="controls">
 						-- custom controls here --
+						<component v-if="current" :is="'controls-' + currentID" />
 					</div>
 				</div>
 				<div class="main-column">
-					<div>Current:{{current}}</div>
+					<div>CurrentID:{{currentID}}</div>
+					Current sketch data: {{current}}
 					-- debug features here --
-					{{sketches}}
+					
+
+					<component v-if="current" :is="'debug-' + currentID" />
 
 				</div>
 			</div>
 
 			
 		</div>`,
+		watch: {
+			current() {
+				console.log("Sketch changed:", this.currentID)
+				this.current.init(app.p5)
+			}
+		},
 		computed: {
+			current() {
+				return this.sketches[this.currentID]
+			},
 			sketchIDs() {
-				return ["a", "b", "c"]
+				return Object.keys(this.sketches)
 			}
 		},
 
@@ -169,6 +183,9 @@ document.addEventListener("DOMContentLoaded", function(){
 					p.createCanvas(canvasW, canvasH)
 					p.colorMode(p.HSL)
 					p.ellipseMode(p.RADIUS)
+
+					if (this.current)
+						this.current.init(p)
 				}
 
 				//-------------------------------------------
@@ -214,7 +231,12 @@ document.addEventListener("DOMContentLoaded", function(){
 
 				let recordedFrame = 0
 				p.draw = () => {
-				
+					// Draw whatever the current's drawing is
+					if (this.current.draw)
+						this.current.draw(p)
+					else {
+						console.warn(`${this.currentID} has no draw fxn`)
+					}
 				}
 
 			}, this.$refs.p5)
@@ -225,9 +247,8 @@ document.addEventListener("DOMContentLoaded", function(){
 		data() {
 			return {
 				sketches: sketches,
-				current: Object.keys(sketches)[0],
-				output: "",
-
+				currentID: Object.keys(sketches)[0],
+				
 			}
 		}
 		
