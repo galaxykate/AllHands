@@ -31,20 +31,22 @@ class GameObject {
 }
 
 class PlayerController extends GameObject {	
-	body
+	box
 
 	constructor(initX, initY, world) {
 		super(initX, initY)
 		var pl = planck, Vec2 = pl.Vec2;
 		this.world = world
-		var box = world.createBody().setDynamic()
-		box.createFixture(pl.Box(0.5, 0.5));
-		box.setPosition(Vec2(this.x, this.y));
-		box.setMassData({mass : 1, center : Vec2(), I : 1})
+		this.box = world.createBody().setDynamic()
+		this.box.createFixture(pl.Box(0.5, 0.5));
+		this.box.setPosition(Vec2(this.x, this.y));
+		this.box.setMassData({ mass : 1, center : Vec2(), I : 1})
 	}
 
 	update(dt) {
-		
+		var pos = this.box.getPosition()
+		this.x = pos.x
+		this.y = pos.y
 	}
 }
 
@@ -54,17 +56,15 @@ sketches["thomas"] = {
 	gameObjects: [],
 	init(p) {
 		console.log("INIT SKETCH", this.id)
-		this.world = planck.World(planck.Vec2(0, -10))
+		this.world = planck.World(planck.Vec2(0, 10))
 		player = new PlayerController(50, 50, this.world)
 		this.gameObjects.push(player);
 	},
 	draw(p, t, dt) {
 		// Update
 		for(var i = 0; i < this.gameObjects.length; i++)
-		{
 			this.gameObjects[i].update(dt)
-		}
-		this.world.step(1/60);
+		this.world.step(1);
 
 		// Draw
 		p.background(0)
