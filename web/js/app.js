@@ -8,6 +8,8 @@ let sketches = {
 }
 
 
+
+
 // Moving noise into the global scope so its not attached to P5
 let noise = () => {}
 const canvasW = 700
@@ -29,8 +31,16 @@ let controls = {
 
 let app = {
 	
-	// 
-	recordingData: {hand:[],face:[]},
+	// Recording and playback for hand-data
+	playback: {
+		paused: false,
+		step: 0,
+		fps: 20,
+		id: "test"
+	},
+	recordedHandData: {
+		test: testHandData
+	},
 
 	// Location of the mouse
 	mouse: new Vector(),
@@ -139,7 +149,7 @@ document.addEventListener("DOMContentLoaded", function(){
 					<div class="p5-holder" ref="p5"></div>
 					<div class="controls" ref="controls">
 						-- custom controls here --
-						<component v-if="current" :is="'controls-' + currentID" />
+						<component v-if="current" :is="'controls-' + currentID" :app="app" :sketch="current" />
 					</div>
 				</div>
 				<div class="main-column">
@@ -148,7 +158,7 @@ document.addEventListener("DOMContentLoaded", function(){
 					-- debug features here --
 					
 
-					<component v-if="current" :is="'debug-' + currentID" />
+					<component v-if="current" :is="'debug-' + currentID"  :app="app" :sketch="current" />
 
 				</div>
 			</div>
@@ -255,6 +265,7 @@ document.addEventListener("DOMContentLoaded", function(){
 		
 		data() {
 			return {
+				app: app,
 				sketches: sketches,
 
 				// Set the current sketch to the last sketch opened

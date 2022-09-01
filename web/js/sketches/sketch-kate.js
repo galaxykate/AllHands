@@ -5,7 +5,11 @@ Vue.component("controls-kate", {
 })
 
 Vue.component("debug-kate", {
-	template: `<div>MY KATE DEBUG HERE!!!!!</div>`,
+	template: `<div>
+
+		MY KATE DEBUG HERE!!!!!
+		{{app.recordedHandData}}
+	</div>`,
 	props: ["app"]
 })
 
