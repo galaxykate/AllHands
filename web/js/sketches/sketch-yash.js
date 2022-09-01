@@ -20,9 +20,9 @@ sketches["yash"] = {
 
 		//play a middle 'C' for the duration of an 8th note
 		// synth.triggerAttackRelease("C4", "8n");
-		new AudioContext();
+		// new AudioContext();
 
-		const osc = new Tone.Oscillator(440, "sine").toDestination().start();
+		// const osc = new Tone.Oscillator(440, "sine").toDestination().start();
 	},
 	draw(p, t, dt) {
 		// p.background(0)
