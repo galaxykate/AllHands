@@ -1,47 +1,81 @@
-
-Vue.component("controls-test", {
+Vue.component("controls-thomas", {
 	template: `<div>MY TEST CONTROLS HERE</div>`,
 	props: ["app"]
 })
 
-Vue.component("debug-test", {
+Vue.component("debug-thomas", {
 	template: `<div>MY TEST DEBUG HERE!!!!!</div>`,
 	props: ["app"]
 })
 
-sketches["test"] = {
-	id: "test",
-	desc: "Example things!",
+class GameObject {
+	x = 0
+	y = 0
+	components = []
+
+	constructor(initX, initY) {
+		this.x = initX
+		this.y = initY
+	}
+
+	register(component) {
+		this.components.push(component);
+		component.gameObject = this;
+	}
+
+	update(dt) {
+		for(var i = 0; i < this.components.length; i++) {
+			this.components.update(dt)
+		}
+	}
+}
+
+class PlayerController extends GameObject {	
+	body
+
+	constructor(initX, initY, world) {
+		super(initX, initY)
+		var pl = planck, Vec2 = pl.Vec2;
+		this.world = world
+		var box = world.createBody().setDynamic()
+		box.createFixture(pl.Box(0.5, 0.5));
+		box.setPosition(Vec2(this.x, this.y));
+		box.setMassData({mass : 1, center : Vec2(), I : 1})
+	}
+
+	update(dt) {
+		
+	}
+}
+
+sketches["thomas"] = {
+	id: "thomas",
+	desc: "Small platformer",
+	gameObjects: [],
 	init(p) {
 		console.log("INIT SKETCH", this.id)
+		this.world = planck.World(planck.Vec2(0, -10))
+		player = new PlayerController(50, 50, this.world)
+		this.gameObjects.push(player);
 	},
 	draw(p, t, dt) {
-		// p.background(0)
-		p.fill(0, 0, 0, 1)
-		p.rect(0, 0, p.width, p.height)
-			
-		let count = 100
-		let size = 6
-		for (var i = 0; i < count; i++) {
+		// Update
+		for(var i = 0; i < this.gameObjects.length; i++)
+		{
+			this.gameObjects[i].update(dt)
+		}
+		this.world.step(1/60);
 
-			let x = i*p.width/count
-			// let y = i*10 + 120*Math.sin(t + i)
-
-			let y = 400*(noise(i*.02, t*.2) - .5) + 300
-
-			let hue = (100*noise(i , t))%360
-			// Set the inner color to be DARKER
-			// let sat = 50 + 50*Math.sin(i +t )
-			let sat = 100
-			p.fill(hue, sat, 30, .2)
-
-			p.strokeWeight(2)
-			p.stroke(hue + 20, sat, 50)
+		// Draw
+		p.background(0)
+		for (var i = 0; i < this.gameObjects.length; i++) {
+			p.strokeWeight(1)
+			p.stroke(100)
 			// p.noStroke()
 			// Set the stroke color to be LIGHTER
-			p.rect(x, y, size, size)
+			go = this.gameObjects[i];
+			p.rect(go.x, go.y, 10, 10)
 		}
-		
 	}
 
 }
