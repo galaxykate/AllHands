@@ -1,12 +1,12 @@
 
 Vue.component("controls-test", {
 	template: `<div>MY TEST CONTROLS HERE</div>`,
-	props: ["app"]
+	props: ["app", "sketch"]
 })
 
 Vue.component("debug-test", {
 	template: `<div>MY TEST DEBUG HERE!!!!!</div>`,
-	props: ["app"]
+	props: ["app", "sketch"]
 })
 
 
