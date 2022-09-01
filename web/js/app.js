@@ -123,7 +123,6 @@ let app = {
 
 
 
-
 // Setup and Vue things
 document.addEventListener("DOMContentLoaded", function(){
 	
@@ -154,7 +153,7 @@ document.addEventListener("DOMContentLoaded", function(){
 				</div>
 				<div class="main-column">
 					<div>CurrentID:{{currentID}}</div>
-					Current sketch data: {{current}}
+				
 					-- debug features here --
 					
 
@@ -202,43 +201,6 @@ document.addEventListener("DOMContentLoaded", function(){
 						this.current.init(p)
 				}
 
-				//-------------------------------------------
-				// Mouse things
-
-				app.mouse.dragStart = new Vector(0,0)
-				app.mouse.dragOffset = new Vector(0,0)
-
-
-				// Utility fxn to test if mouse in p5
-				function mouseInP5() {
-					return p.mouseX > 0 && p.mouseX < canvasW && p.mouseY > 0 && p.mouseY < canvasH
-				}
-
-				p.mousePressed = () => {
-					if (mouseInP5()) {
-						app.mouse.dragging = true
-						app.mouse.dragStart.setTo(p.mouseX, p.mouseY)
-					}
-				}
-				p.mouseReleased = () => {
-					// Stopped dragging? Update the offset
-					app.mouse.dragging = false
-					controls.maskOffset[0] += app.mouse.dragOffset[0]
-					controls.maskOffset[1] += app.mouse.dragOffset[1]
-					app.mouse.dragOffset.setTo(0, 0)
-				}
-				
-				p.mouseMoved = () => { app.mouse.setTo(p.mouseX, p.mouseY) }
-				p.mouseDragged = () => {
-					app.mouse.setTo(p.mouseX, p.mouseY)
-					if (app.mouse.dragging) {
-						app.mouse.dragOffset.setToDifference(app.mouse.dragStart, app.mouse)
-				
-					}
-				}
-				p.doubleClicked = () => {}
-
-				p.mouseClicked = () => {}
 
 				//-------------------------------------------
 				// Draw
