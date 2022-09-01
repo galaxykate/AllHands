@@ -157,8 +157,12 @@ document.addEventListener("DOMContentLoaded", function(){
 		</div>`,
 		watch: {
 			current() {
-				console.log("Sketch changed:", this.currentID)
+				
 				this.current.init(app.p5)
+			},
+			currentID() {
+				console.log("Sketch id changed:", this.currentID)
+				localStorage.setItem("lastSketch", this.currentID)
 			}
 		},
 		computed: {
@@ -252,7 +256,10 @@ document.addEventListener("DOMContentLoaded", function(){
 		data() {
 			return {
 				sketches: sketches,
-				currentID: Object.keys(sketches)[0],
+
+				// Set the current sketch to the last sketch opened
+				// (or the first sketch in the list if there isn't one)
+				currentID: localStorage.getItem("lastSketch")||Object.keys(sketches)[0],
 				
 			}
 		}
