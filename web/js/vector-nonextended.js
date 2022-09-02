@@ -794,6 +794,9 @@
 			if (p== undefined || !p.line)
 				throw("Remember to include P5 object as the p argument")
 
+			if (v.v)
+				v = v.v
+			
 			let x = v[0] - this.v[0]
 			let y = v[1] - this.v[1]
 

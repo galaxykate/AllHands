@@ -56,7 +56,9 @@ sketches["watercolor"] = {
 	draw(p, t, dt) {
 		this.frame += 1
 		// p.background(0)
-		p.fill(0, 0, 0, .04)
+		let baseHue = (450 + 440*noise(t))%360
+		p.fill(baseHue, 40, 50 + 40*noise(t), .04)
+
 		if (Math.random() < .1)
 			p.rect(0, 0, p.width, p.height)
 
@@ -131,14 +133,14 @@ sketches["watercolor"] = {
 			// Draw as circles
 			hand.forEachFinger((finger, fingerIndex) => {
 				p.noStroke()
-				let hue = (fingerIndex*20 + handIndex*120)%360
+				let hue = (baseHue + fingerIndex*20 + handIndex*120)%360
 				let pt = finger.fingerTip
 				console.log(pt)
 				for (var i = 0; i < 10; i++) {
 					let r = 3 + 8*Math.random()
 					p.noStroke()
-					p.fill(hue + 10*Math.random(), 100, 30 + Math.random()*50, .1)
-					pt.drawPolarOffsetCircle(p, Math.random()*30, Math.random()*100, r)
+					p.fill(hue + 10*Math.random(), 100, 30 + Math.random()*50, .07)
+					pt.drawPolarOffsetCircle(p,  Math.random()**2*40, Math.PI/2 + -finger.angle + Math.random()*2, r)
 				
 				}
 					
