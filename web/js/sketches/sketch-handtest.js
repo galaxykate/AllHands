@@ -48,7 +48,7 @@ sketches["handtest"] = {
 	},
 
 	draw(p, t, dt) {
-		// p.background(0)
+		p.background(100)
 		// p.fill(0, 0, 100, .1)
 		// p.rect(0, 0, p.width, p.height)
 
@@ -74,43 +74,43 @@ sketches["handtest"] = {
 		app.hands.forEachHand((hand, handIndex) => {
 			// Draw as circles
 			hand.forEachFinger((finger, fingerIndex) => {
-				p.noStroke()
 				finger.joints.forEach((joint, jointIndex) => {
-					for (var i = 0; i < 5; i++) {
-						let p2 = new Vector(joint)
-					
-						p.fill(fingerIndex*20 + 150*handIndex, 100, 50, .2)
-						joint.draw(p, 20)
-					}
 					
 					
 
 				})
+				p.strokeWeight(3)
+				finger.pointingVector.drawArrow({
+					p: p,
+					center: finger.fingerTip,
+				})
+				p.fill(0)
+				p.text("ANGLE" + finger.angle.toFixed(2), ...finger.fingerTip.v )
 			}) 
-		})
+		
 
-		// 	// Draw as tube
-		// 	hand.forEachFinger((finger, fingerIndex) => {
-		// 		p.strokeWeight(10)
-		// 		p.noFill()
-		// 		p.stroke(fingerIndex*20 + 150*handIndex, 100, 50, 1)
-		// 		p.beginShape()
-		// 		finger.joints.forEach((joint, jointIndex) => {
-		// 			joint.vertex(p)
-		// 			// joint.draw(p, 10)
-		// 		})
-		// 		p.endShape()
-		// 	}) 
-		// 	p.noStroke()
+			// Draw as tube
+			hand.forEachFinger((finger, fingerIndex) => {
+				p.strokeWeight(10)
+				p.noFill()
+				p.stroke(fingerIndex*20 + 150*handIndex, 100, 50, 1)
+				p.beginShape()
+				finger.joints.forEach((joint, jointIndex) => {
+					joint.vertex(p)
+					// joint.draw(p, 10)
+				})
+				p.endShape()
+			}) 
+			p.noStroke()
 				
-		// 	// Just fingertips
-		// 	hand.forEachFinger((finger, fingerIndex) => {
-		// 		p.noFill()
-		// 		p.strokeWeight(1)
-		// 		p.stroke(fingerIndex*20 + 150*handIndex, 100, 50, .4)
-		// 		finger.fingerTip.draw(p, 50)
-		// 	}) 
-		// })
+			// Just fingertips
+			// hand.forEachFinger((finger, fingerIndex) => {
+			// 	p.noFill()
+			// 	p.strokeWeight(1)
+			// 	p.stroke(fingerIndex*20 + 150*handIndex, 100, 50, .4)
+			// 	finger.fingerTip.draw(p, 50)
+			// }) 
+		})
 
 		p.pop()
 	}
