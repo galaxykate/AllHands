@@ -27,21 +27,26 @@ sketches["thomas"] = {
 		this.gameObjects.push(new Platform(24, 0, 1, 25, this.world))
 		this.gameObjects.push(new Platform(0, 0, 25, 1, this.world))
 		let level1 = createLevel(this.world)
-		//this.gameObjects = this.gameObjects.concat(level1)
+		this.gameObjects = this.gameObjects.concat(level1)
 	},
 	draw(p, t, dt) {
 		// Update
 
-		var index = 0
-		app.hands.forEachHand((hand, handIndex) => {
-			hand.forEachFinger((finger, fingerIndex) => {
-				this.floor.points[index].y = 25*(finger.fingerTip.y / p.height)
-				index++
-			})
-		})
+		fingers = [];
 
-		// for(var i = 0; i < this.floor.points.length; i++)
-		// 	this.floor.points[i].y = finger.fingerTip[i].y
+        var index = 0
+        app.hands.forEachHand((hand, handIndex) => {
+            hand.forEachFinger((finger, fingerIndex) => {
+                fingers.push([finger.fingerTip.x, finger.fingerTip.y])
+
+                index++
+            })
+        })
+
+        fingers = fingers.sort(sortFunction);
+
+        for(var i = 0; i < this.floor.points.length; i++)
+            this.floor.points[i].y =  25*(fingers[i][1] / p.height)
 
 		for(var i = 0; i < this.gameObjects.length; i++)
 			this.gameObjects[i].update(p, dt)
@@ -52,5 +57,5 @@ sketches["thomas"] = {
 		for (var i = 0; i < this.gameObjects.length; i++) {
 			this.gameObjects[i].draw(p)
 		}
-	}	
+	}
 }

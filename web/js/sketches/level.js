@@ -13,3 +13,13 @@ function createLevel(world)
     gameObjectsLocal.push(obsticale(20, 3, 3, 1, world));
     return gameObjectsLocal
 }
+
+function sortFunction(a, b){
+    if (a[0] === b[0]) {
+        return 0;
+
+    }
+    else {
+        return (a[0] < b[0]) ? -1 : 1;
+    }
+}
