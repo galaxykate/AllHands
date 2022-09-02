@@ -7,6 +7,7 @@ class Finger {
 		this.joints = []
 		for (var i = 0; i < 4; i++) {
 			this.joints[i] = new Vector(Math.random()*100, Math.random()*100)
+			this.joints[i].visible = true
 		}
 
 		this.fingerTip = this.joints[3]
@@ -29,15 +30,35 @@ class Hand {
 	forEachFinger(fxn) {
  		this.fingers.forEach(fxn)
  	}
- 	setFromFrame(data) {
+
+ 	forEachFingertip(fxn) {
+ 		this.fingers.forEach((f,fingerIndex) => fxn(f.fingerTip, fingerIndex))
+ 	}
+
+ 	setFromFrame(data, hf) {
+
  		this.data = data
- 		// console.log(data.length)
- 		this.wrist.setTo(data[0])
+ 		// console.log("Hand data", data.length, data)
+
+ 		function setPt(v, pt) {
+ 			if (hf) {
+				// Handsfree is in format {x,y,visiblity}
+				let pos = [-(pt.x)*canvasW + canvasW, (pt.y)*canvasH]
+				v.setTo(pos)
+				
+			} else
+				v.setTo(pt[0] + canvasW/2, pt[1] + canvasW/2)
+ 		}
+ 		setPt(this.wrist, data[0])
+ 		// this.wrist.setTo(data[0])
  		// First 5 are thumb
  		this.fingers.forEach((finger,fingerIndex) => {
  			for (var i = 0; i < finger.joints.length; i++) {
  				let i2 = i + fingerIndex*4 + 1
- 				finger.joints[i].setTo(data[i2])
+ 				let pt = data[i2]
+ 				if (pt) {
+ 					setPt(finger.joints[i], pt)
+ 				}
  			}
  		})
  	}
@@ -45,7 +66,10 @@ class Hand {
 
 
 class Hands {
+
+
  	constructor() {
+ 		this.recordingBuffer = []
  		this.hands = []
  	}
 
@@ -61,8 +85,8 @@ class Hands {
  		return this.hands[1]
  	}
 
- 	setFromFrame(data) {
- 		// console.log(data)
+ 	setFromFrame(data, hf) {
+ 		// console.log("Set from frame", data, hf)
  		// Ok, we have N hands
  		for (var i = 0; i < data.length; i++) {
  			if (this.hands.length -1 < i) {
@@ -70,7 +94,7 @@ class Hands {
  				this.hands.push(new Hand())
  			}
  			let hand = this.hands[i]
- 			hand.setFromFrame(data[i])
+ 			hand.setFromFrame(data[i], hf)
  		}
  	}
 
@@ -84,6 +108,14 @@ class Hands {
 
  	toArray(data) {
 
+ 	}
+
+ 	applyHandsFreeData(data) {
+ 		if (!app.paused) {
+	 		this.setFromFrame(data, true)
+	 		this.recordingBuffer.push(data)
+	 	}
+ 		// add to 
  	}
  }
 
@@ -121,7 +153,19 @@ class Hands {
 
 
 Vue.component("playback", {
-	template: `<div>
+	template: `<div style="display:flex">
+
+		
+
+		<div>
+			<button @click="toggleHF">ENABLE LIVE TRACKING</button>
+			<span class="label">HF:</span>{{handsfreeStatus}}
+			<span class="label">MODE:</span>{{mode}}
+
+		</div>
+
+
+
 		<!-- PLAYBACK UI -->
 		<div  class="section">
 			<span class="label">Play recording</span>
@@ -130,7 +174,7 @@ Vue.component("playback", {
 			</select>
 
 			<button class="emoji-button" @click="togglePlayback">
-				<span v-if="mode='playback'">⏸</span>
+				<span v-if="mode==='playback'">⏸</span>
 				<span v-else>▶️</span>
 			</button>
 			<input class="slider" type="range" v-model="pct">
@@ -159,7 +203,7 @@ Vue.component("playback", {
 
 		// When to increment the hand data
 		setInterval(() => {
-			if (!app.paused) {
+			if (!app.paused && this.mode === "playback") {
 				this.step += 1
 				this.step %= this.playbackData.length
 				app.hands.setFromFrame(this.playbackData[this.step])
@@ -168,6 +212,15 @@ Vue.component("playback", {
 				
 	},
 	methods: {
+		toggleHF() {
+			if (this.mode !== "live") {
+
+				this.mode = "live"
+				initHandsFree()
+			} else {
+				this.mode = "playback"
+			}
+		},
 		togglePlayback() {
 
 		},
@@ -177,6 +230,10 @@ Vue.component("playback", {
 
 	},
 	computed: {
+		handsfreeStatus() {
+			let statusWords = ["inactive", "loading", "active", "hands detected"]
+			return statusWords[app.handsfreeStatus]
+		},
 		playbackData() {
 			return recordedHandData.test
 		},
@@ -191,12 +248,13 @@ Vue.component("playback", {
 	},
 	data() {
 		return {
+			app: app,
 			recordedHandData: recordedHandData,
 			step: 0,
 			// "playback", "live"
 			isRecording: false,
 			mode: "playback",
-			recordingBuffer: [],
+			
 			recordingID: "myhands",
 			playbackID: "test"
 		}
