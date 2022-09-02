@@ -46,7 +46,7 @@ document.addEventListener("DOMContentLoaded", function(){
 				
 				<!-- SKETCH SELECTOR -->
 				<div class="header-section">
-					<span class="label">Select sketch</span>
+					<span class="label">Select</span>
 					<select v-model="currentID">
 						<option v-for="id in sketchIDs">{{id}}</option>
 					</select>
@@ -64,11 +64,11 @@ document.addEventListener("DOMContentLoaded", function(){
 				<div class="main-column">
 					<div class="p5-holder" ref="p5"></div>
 					<div class="controls" ref="controls">
-						-- custom controls here --
+						
 						<component v-if="current" :is="'controls-' + currentID" :app="app" :sketch="current" />
 					</div>
 				</div>
-				<div class="main-column">
+				<div class="main-column" id="debug">
 					<div>CurrentID:{{currentID}}</div>
 				
 					-- debug features here --

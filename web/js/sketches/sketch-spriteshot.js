@@ -16,6 +16,10 @@ Vue.component("debug-spriteshot", {
 
 	On Alien?: 
 	{{sketch.overlapping}}
+
+	<br>
+	Regen:
+	{{sketch.alien.regening}}
 	</div>`,
 
 	props: ["app","sketch"]
@@ -44,6 +48,24 @@ BULLET2 = [
 	[1,0,0,1]
 ]
 
+//special text effects
+function Effects(x,y,txt,size=32,color="#ff0000"){
+	this.x = x;
+	this.y = y;
+	this.txt = txt;
+	this.size = size;
+	this.color = color;
+}
+
+Effects.prototype.draw = function(p){
+	p.push()
+	p.translate(this.x,this.y)
+	p.fill(this.color)
+	p.text(this.txt,0,0)
+	p.pop()
+}
+
+
 
 //make a new alien sprite
 function Alien2(x,y,bc,grid){
@@ -53,9 +75,13 @@ function Alien2(x,y,bc,grid){
 	this.grid = grid;
 	this.tx = -1;
 	this.ty = -1;
+	this.regenArea = grid;
+	this.regenTick = 0;
+	this.regening = false;
+	this.tin = 10
 }
 
-Alien2.prototype.draw = function(p) {
+Alien2.prototype.draw = function(p,t) {
 	p.push()
 	p.translate(this.x, this.y)
 
@@ -76,7 +102,10 @@ Alien2.prototype.draw = function(p) {
 				continue
 			if (isNaN(v))
 				v = this.baseColor
-			p.fill(COLORS[v]);
+
+			let alpha = 255
+			// let alpha = (this.regening && this.regenArea[r][c] == 1) ? Math.min(255,Math.floor((t - this.regenTick)/this.tin)) : 255;
+			p.fill(COLORS[v]+alpha.toString(16));
 			p.strokeWeight(1);
 			p.stroke("#000000")
 			p.rect(c*PX_SIZE,r*PX_SIZE,PX_SIZE,PX_SIZE);
@@ -247,7 +276,6 @@ Alien2.prototype.remove = function(x,y,bullet){
 	for(let r=0;r<4;r++){
 		for(let c=0;c<4;c++){
 			if(bullet[r][c] == 1){
-				console.log("hey")
 				continue
 			}
 			let x2 = x+c;
@@ -263,6 +291,15 @@ Alien2.prototype.remove = function(x,y,bullet){
 
 //rebuild from a chunk blown off
 Alien2.prototype.rebuild = function(X,y,bullet){
+	let ra = []
+	for(let b=0;b<8;b++){
+		let rb = []
+		for(let d=0;d<8;d++){
+			rb.push(0);
+		}
+		ra.push(rb)
+	}
+
 	let repairColor = this.newPart()
 	let s = bullet.length; //assume circular bullet
 	for(let r=0;r<s+1;r++){
@@ -280,9 +317,11 @@ Alien2.prototype.rebuild = function(X,y,bullet){
 					f = v;
 				}
 				this.grid[y2][x2] = f
+				ra[y2][x2] = 1
 			}
 		}
 	}
+	this.regenArea = ra;
 }
 
 //check if bounding box overlapped
@@ -318,15 +357,23 @@ Alien2.prototype.relPos = function(t){
 }
 
 
+Alien2.prototype.regenerate = function(){
+	this.mutateCA();
+}
+
 sketches["spriteshot"] = {
 	id: "spriteshot",
 	desc: "Example things!",
 	alien:null,
 	overlapping:false,
+	effects:[],
+	hehe:[],
 	init(p) {
 		console.log("INIT SKETCH", this.id)
 		// this.alien = new Alien2(p.width/2,p.height/2,4,BASE_DESIGN);
 		this.alien = new Alien2(p.width/2,p.height/2,4,BASE_DESIGN);
+		this.effects = []
+		this.hehe = []
 	},
 
 	//randomly remove parts of the alien
@@ -352,14 +399,16 @@ sketches["spriteshot"] = {
 	pow(mx,my){
 		let target = {x:mx,y:my-20,r:16}
 		if(!this.alien.canHit(target)){
-			console.log("MISS!");
-			return
+			// console.log("MISS!");
+			return "MISS!"
 		}
 		apos = this.alien.relPos(target)
 		this.alien.tx = apos.x;
 		this.alien.ty = apos.y;
-		console.log(`BANG BANG!: ${apos.x},${apos.y}`)
+		// console.log(`BANG BANG!: ${apos.x},${apos.y}`)
 		this.alien.remove(apos.x,apos.y,BULLET2)
+		this.alien.rebuild(apos.x,apos.y,BULLET2)
+		return "BANG!"
 		
 	},
 
@@ -367,6 +416,11 @@ sketches["spriteshot"] = {
 	inRange(X,Y){
 		let target = {x:X,y:Y-20,r:16}
 		return this.alien.canHit(target)
+	},
+
+	removeEffect(i){
+		// console.log(this.hehe);
+		this.effects.shift();
 	},
 
 
@@ -385,6 +439,14 @@ sketches["spriteshot"] = {
 		this.alien.draw(p)
 		p.pop()
 
+		//draw the effects
+		for(let e=0;e<this.effects.length;e++){
+			p.push()
+			p.translate()
+			this.effects[e].draw(p)
+			p.pop()
+		}
+
 
 		//draw the gun
 		let xp = p.mouseX-5;
@@ -397,14 +459,36 @@ sketches["spriteshot"] = {
 		p.fill(359,100,50,0.2)
 		p.ellipse(p.mouseX,p.mouseY,16*2);
 
-		this.overlapping = this.inRange(xp,yp);
-		p.fill(0)
-		p.text(`${this.alien.tx},${this.alien.ty}`,this.alien.x+5*PX_SIZE,this.alien.y+12*PX_SIZE)
+		// this.overlapping = this.inRange(xp,yp);
+		// p.fill(0)
+		// p.text(`${this.alien.tx},${this.alien.ty}`,this.alien.x+5*PX_SIZE,this.alien.y+12*PX_SIZE)
+
 
 		if(p.mouseIsPressed){
-			this.pow(xp,yp);
+			let fx = this.pow(xp,yp);
+			if(fx == "BANG!"){
+				this.alien.regenTick = t;
+				// this.alien.regening = true;
+			}
+
+			//give special effect
+			let ef = new Effects(xp-16,yp-48,fx,32,(fx == "MISS!" ? "#ff0000" : "#0000FF"))
+			this.effects.push(ef)
+			setTimeout(() => {
+				this.removeEffect()
+			} ,800)
 		}
 
+		//continuously make new parts every 5 seconds
+		setInterval(() =>{
+			if(!this.alien.regening)
+				this.alien.mutateCA();
+		},5000);
+
+
+		if(Math.floor((t - this.alien.regenTick)/this.alien.tin) > 255){
+			this.alien.regening = false;
+		}
 	}
 
 }

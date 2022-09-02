@@ -28,6 +28,12 @@ sketches["thomas"] = {
 		this.gameObjects.push(new Platform(0, 0, 25, 1, this.world))
 		let level1 = createLevel(this.world)
 		this.gameObjects = this.gameObjects.concat(level1)
+		this.world.on('post-solve', function(contact) {
+			var fA = contact.getFixtureA(), bA = fA.getBody();
+			var fB = contact.getFixtureB(), bB = fB.getBody();
+			fA.getUserData().collision(fB.getUserData());
+			fB.getUserData().collision(fA.getUserData());
+		});
 	},
 	draw(p, t, dt) {
 		// Update
