@@ -26,6 +26,8 @@ sketches["thomas"] = {
 		this.gameObjects.push(new Platform(0, 0, 1, 25, this.world))
 		this.gameObjects.push(new Platform(24, 0, 1, 25, this.world))
 		this.gameObjects.push(new Platform(0, 0, 25, 1, this.world))
+		let level1 = createLevel(this.world)
+		//this.gameObjects = this.gameObjects.concat(level1)
 	},
 	draw(p, t, dt) {
 		// Update
