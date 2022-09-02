@@ -1,15 +1,15 @@
-Vue.component("controls-spriteshot", {
+Vue.component("controls-spriteshot-inmotion", {
 	template: `<div>
 	<button @click='sketch.alien = sketch.alien.mutate()'>🧬</button>
 	<button @click='sketch.alien = sketch.alien.mutateCA()'>🌳</button>
 	<button @click='sketch.alien = sketch.alien.safeMutate()'>👍</button>
 	<button @click='sketch.randRemove()'>💥</button>
-	<button @click='sketch.randShootandFix()'>🤕</button>
+	<button @click='sketch.alien = sketch.alien.rebuild()'>🤕</button>
 	</div>`,
 	props: ["app","sketch"]
 })
 
-Vue.component("debug-spriteshot", {
+Vue.component("debug-spriteshot-inmotion", {
 	// template: `<div>${invaders[0].X},${invaders[0].y}</div>`,
 	// template: `<div>${invaders[0].X}</div>`,
 	template: `<div>hehehe</div>`,
@@ -34,10 +34,10 @@ BASE_DESIGN = [
 COLORS = ["#bada55","#ED0003","#FF8600","#FEFE37","#01FE00","#3501FF","#8C00FC","#ffffff",'#000000']
 
 BULLET = [
-	[1,0,0,1],
-	[0,0,0,0],
-	[0,0,0,0],
-	[1,0,0,1]
+	[1,1,0,0,1,1],
+	[1,0,0,0,0,1],
+	[1,0,0,0,0,1],
+	[1,1,0,0,1,1]
 ]
 
 
@@ -47,17 +47,18 @@ function Alien(X,y,bc,grid){
 	this.y = y;
 	this.baseColor = bc
 	this.grid = grid;
+	this.dir = 1;
 }
 
 //Need to fix this (maybe use premade sprites of varying colors)
-Alien.prototype.mutate = function(repairColor,prob=0.1){
+Alien.prototype.mutate = function(prob=0.1){
 	grid2 = [];
 	for(let r=0;r<8;r++){
 		let row=[];
 		for(let c=0;c<8;c++){
 			let v = this.grid[r][c]
 			if(prob*(v==0?1:0.25) > Math.random()){   //more likely to add than delete a pixel
-				row.push((Math.random() < 0.3 ? this.baseColor : repairColor))
+				row.push(this.baseColor)
 				//row.push(Math.floor(Math.random()*9))
 			}else{
 				row.push(v)
@@ -140,14 +141,7 @@ Alien.prototype.changeBase = function(){
 	}
 }
 
-Alien.prototype.newPart = function(prob=0.4){
-	if(Math.random()<prob)
-		return this.baseColor;
-	else
-		return Math.floor(Math.random()*7)+1
-}
-
-Alien.prototype.mutateCA = function(repairColor,prob=0.5){
+Alien.prototype.mutateCA = function(prob=0.5){
 	grid2 = [];
 	for(let r=0;r<8;r++){
 		let row=[];
@@ -159,7 +153,7 @@ Alien.prototype.mutateCA = function(repairColor,prob=0.5){
 			}
 			let nnei = this.ctNei(c,r);
 			if(nnei > 0 && nnei < 4){   //more likely to add than delete a pixel
-				row.push((prob < Math.random() ? (Math.random() < 0.3 ? this.baseColor : repairColor) : 0))
+				row.push((prob < Math.random() ? this.baseColor : 0))
 				//row.push(Math.floor(Math.random()*9))
 			}else if(nnei == 4 || nnei == 0){
 				row.push(0);
@@ -172,9 +166,8 @@ Alien.prototype.mutateCA = function(repairColor,prob=0.5){
 	return new Alien(this.X,this.y,this.baseColor,grid2)
 }
 
-//mutate with cellular automata but ensure there is enough pixels left in the sprite
 Alien.prototype.safeMutate = function(perc=0.5){
-	let newAlien = this.mutateCA(this.newPart());
+	let newAlien = this.mutateCA();
 	//add the face back
 	for(let r=1;r<4;r++){
 		for(let c=2;c<6;c++){
@@ -188,11 +181,8 @@ Alien.prototype.safeMutate = function(perc=0.5){
 	for(let b=0;b<10;b++){
 		if(newAlien.ctColor() < 64*0.5)
 			break
-		newAlien = newAlien.mutate(this.newPart());	
+		newAlien = newAlien.mutate();	
 	}
-
-	//replace majority color
-	newAlien.changeBase();
 
 	return newAlien
 
@@ -203,45 +193,26 @@ Alien.prototype.remove = function(X,y,bullet){
 	let s = bullet.length; //assume circular bullet
 	for(let r=0;r<s;r++){
 		for(let c=0;c<s;c++){
-			if(bullet[r][c] == 1)
-				continue
-			let x2 = X+c;
-			let y2 = y+r;
-			if(x2<8 && x2>=0 && y2<8 && y2>=0 && this.grid[y2][x2]!=8){
-				this.grid[y2][x2] = 0;  //delete or keep the pixel
-			}
+			let x2 = X+r;
+			let y2 = y+c;
+			if(x2<8 && x2>=0 && y2<8 && y2>=0)
+				this.grid[y2][x2] = this.grid[y2][x2]&bullet[r][c];  //delete or keep the pixel
 		}
 	}
 }
 
-//rebuild from a chunk blown off
-Alien.prototype.rebuild = function(X,y,bullet,repairColor){
-	let s = bullet.length; //assume circular bullet
-	for(let r=-1;r<s+1;r++){
-		for(let c=-1;c<s+1;c++){
-			let x2 = X+c;
-			let y2 = y+r;
-			if(x2<8 && x2>=0 && y2<8 && y2>=0 && this.grid[y2][x2]!=8){
-				let f = 0;
-				let nnei = this.ctNei(y2,x2);
-				if(nnei > 0 && nnei < 4){   //more likely to add than delete a pixel
-					f = (0.5 < Math.random() ? (Math.random() < 0.3 ? this.baseColor : repairColor) : 0)
-					//row.push(Math.floor(Math.random()*9))
-				}else if(nnei == 4 || nnei == 0){
-					f = 0;
-				}
-				this.grid[y2][x2] = f;
-			}
-		}
-	}
+//rebuild from a chunk
+Alien.prototype.rebuild = function(section){
+
 }
 
 
 
-sketches["spriteshot"] = {
-	id: "spriteshot",
+sketches["spriteshot-inmotion"] = {
+	id: "spriteshot-inmotion",
 	desc: "Example things!",
 	alien:null,
+	dir:1,
 	init(p) {
 		console.log("INIT SKETCH", this.id)
 		this.alien = new Alien(p.width/2-64,p.height/2-64,4,BASE_DESIGN);
@@ -251,29 +222,25 @@ sketches["spriteshot"] = {
 	randRemove(){
 		let x = Math.floor(Math.random()*10)-2;
 		let y = Math.floor(Math.random()*10)-2;
-		// let x = 3;
-		// let y = 2;
-		// let x = 0;
-		// let y = 0;
 		console.log(`BANG!: ${x},${y}`)
 		this.alien.remove(x,y,BULLET);
-	},
-
-	randShootandFix(){
-		let x = Math.floor(Math.random()*10)-2;
-		let y = Math.floor(Math.random()*10)-2;
-		console.log(`BANG!: ${x},${y}`)
-		this.alien.remove(x,y,BULLET);
-		this.alien.rebuild(x,y,BULLET,this.alien.newPart());
 	},
 
 
 	draw(p, t, dt) {
 		
-		let X = 30;
-		let y = 40;
+		// let X = 30;
+		// let y = 40;
 
 		//
+		this.alien.X += this.dir*(5)
+		this.alien.y = p.constrain( 500*(noise(2, t*1.2) - .5) + 100, -100, p.height)
+		
+		// change dir when out of bounds
+		if (this.alien.X >= p.width || this.alien.X <=-120){
+			this.dir *= -1
+		}
+
 		p.background(359)
 		for(let r=0;r<8;r++){
 			for(let c=0;c<8;c++){
@@ -284,7 +251,7 @@ sketches["spriteshot"] = {
 					v = this.alien.baseColor
 				p.fill(COLORS[v]);
 				p.stroke("#000000")
-				p.rect(X+c*PX_SIZE,y+r*PX_SIZE,PX_SIZE,PX_SIZE);
+				p.rect(this.alien.X+c*PX_SIZE,this.alien.y+r*PX_SIZE,PX_SIZE,PX_SIZE);
 			}
 		}
 
