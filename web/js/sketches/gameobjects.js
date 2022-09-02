@@ -25,7 +25,7 @@ class GameObject {
 class FloorController extends GameObject {
 	points = []
 	bodies = []
-	height = 0.5
+	height = 1
 	width
 	numOfFingers = 10
 
