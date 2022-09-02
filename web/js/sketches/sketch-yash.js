@@ -19,8 +19,8 @@ Vue.component("controls-yash", {
 
 			// var synth = new Tone.AMSynth().toDestination()
 
-			// const note = Tone.Time(this.sketch.freq).toNotation() 
-			// const tune = this.sketch.soundNum
+			const note = Tone.Time(this.sketch.freq).toNotation() 
+			const tune = this.sketch.soundNum
 
 			// this.sketch.synth.triggerAttack(Tone.Midi(tune).toMidi(), note)
 
@@ -34,9 +34,8 @@ Vue.component("controls-yash", {
 			const tune = this.sketch.sounds_x[0]
 
 			var tunee = Tone.Frequency( this.sketch.music[Math.floor(this.sketch.sounds_x[0])], "midi").toNote()
-			console.log(tunee)
-			this.sketch.synth.triggerAttackRelease([Tone.Midi(tunee).transpose(this.sketch.sounds[5])], note); // "C5");
-			// this.sketch.synth.releaseAll(now+note);
+			// this.sketch.synth.setNote(tunee); // "C5");
+			this.sketch.synth.triggerAttackRelease([tunee,Tone.Midi(tunee).transpose(this.sketch.sounds[5])],note)
 			
 		}			
 	},
@@ -69,11 +68,11 @@ sketches["yash"] = {
 	id: "yash",
 	desc: "Example things!",
 	soundNum: 40,
-	freq: 0.3,
+	freq: 2,
 	sounds: [],
 	sounds_x: [],
 	music: [],
-	synth : new Tone.PolySynth(Tone.Synth).toDestination(),
+	synth : new Tone.PolySynth(Tone.AMSynth).toDestination(),
 	init(p) {
 		console.log("INIT SKETCH", this.id)
 		for(var i=0; i<10; i++){
@@ -82,8 +81,8 @@ sketches["yash"] = {
 		for(var i=0; i<10; i++){
 			this.sounds_x.push(20*i)
 		}
-		for(var i=0; i<30; i++){
-				this.music.push(i*3)
+		for(var i=0; i<100; i++){
+				this.music.push(i+10)
 		}
 	},
 	draw(p, t, dt) {
@@ -100,12 +99,10 @@ sketches["yash"] = {
 				hand.forEachFinger((finger, fingerIndex) => {
 					
 					var samp_x = finger.fingerTip.v[0]
-					samp_x = samp_x*30/p.width
+					samp_x = samp_x*90/p.width
 
 					var samp = finger.fingerTip.v[1]
-					samp = (p.height - samp)*30/p.height
-
-
+					samp = samp*5/p.height
 				this.sounds[fingerIndex+handIndex*5] = samp
 				this.sounds_x[fingerIndex+handIndex*5] = samp_x
 				
