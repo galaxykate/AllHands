@@ -12,9 +12,13 @@ Vue.component("controls-spriteshot", {
 Vue.component("debug-spriteshot", {
 	// template: `<div>${invaders[0].X},${invaders[0].y}</div>`,
 	// template: `<div>${invaders[0].X}</div>`,
-	template: `<div>hehehe</div>`,
+	template: `<div>
 
-	props: ["app"]
+	On Alien?: 
+	{{sketch.overlapping}}
+	</div>`,
+
+	props: ["app","sketch"]
 })
 
 //ALIEN DESIGN
@@ -33,7 +37,7 @@ BASE_DESIGN = [
 
 COLORS = ["#bada55","#ED0003","#FF8600","#FEFE37","#01FE00","#3501FF","#8C00FC","#ffffff",'#000000']
 
-BULLET = [
+BULLET2 = [
 	[1,0,0,1],
 	[0,0,0,0],
 	[0,0,0,0],
@@ -42,15 +46,53 @@ BULLET = [
 
 
 //make a new alien sprite
-function Alien(X,y,bc,grid){
-	this.X = X;
+function Alien2(x,y,bc,grid){
+	this.x = x;
 	this.y = y;
 	this.baseColor = bc
 	this.grid = grid;
+	this.tx = -1;
+	this.ty = -1;
+}
+
+Alien2.prototype.draw = function(p) {
+	p.push()
+	p.translate(this.x, this.y)
+
+	 // p.fill(0, 100, 50)
+	 // p.circle(0,0,100)
+	 // p.push()
+	 // p.translate(-100,-100)
+// Draw all pixels
+
+// for (let i = 0; i < 10; i++) {
+// 	p.translate(90, 10)
+// 	p.rotate(10)
+	for(let r=0;r<8;r++){
+		for(let c=0;c<8;c++){
+			// ggird value
+			let v = this.grid[r][c]
+			if (v == 0)  //skip transparent
+				continue
+			if (isNaN(v))
+				v = this.baseColor
+			p.fill(COLORS[v]);
+			p.strokeWeight(1);
+			p.stroke("#000000")
+			p.rect(c*PX_SIZE,r*PX_SIZE,PX_SIZE,PX_SIZE);
+		}
+	}
+	//show top left
+	// p.fill(0,100,50)
+	// p.circle(0,0,10)
+// }
+	// p.pop()
+
+	p.pop()
 }
 
 //Need to fix this (maybe use premade sprites of varying colors)
-Alien.prototype.mutate = function(repairColor,prob=0.1){
+Alien2.prototype.mutate = function(repairColor,prob=0.1){
 	grid2 = [];
 	for(let r=0;r<8;r++){
 		let row=[];
@@ -65,11 +107,11 @@ Alien.prototype.mutate = function(repairColor,prob=0.1){
 		}
 		grid2.push(row)
 	}
-	return new Alien(this.X,this.y,this.baseColor,grid2)
+	return new Alien2(this.x,this.y,this.baseColor,grid2)
 }
 
 //count the non-zero neighbors for a cell grid
-Alien.prototype.ctNei = function(x,y){
+Alien2.prototype.ctNei = function(x,y){
 	let n = 0;
 	if(y-1>=0 && this.grid[y-1][x]!=0)
 		n++;
@@ -83,7 +125,7 @@ Alien.prototype.ctNei = function(x,y){
 }
 
 //count the number of non-zero colors
-Alien.prototype.ctColor = function(){
+Alien2.prototype.ctColor = function(){
 	let c = 0;
 	for(let r=0;r<8;r++){
 		for(let c=0;c<8;c++){
@@ -96,7 +138,7 @@ Alien.prototype.ctColor = function(){
 
 //set the base color to the majority non-zero color
 //NOT TESTED lol
-Alien.prototype.changeBase = function(){
+Alien2.prototype.changeBase = function(){
 	let colCt = [0] //first is base color (instead of zero)
 	for(let o=0;o<COLORS.length;o++){
 		colCt.push(0)
@@ -140,14 +182,15 @@ Alien.prototype.changeBase = function(){
 	}
 }
 
-Alien.prototype.newPart = function(prob=0.4){
+Alien2.prototype.newPart = function(prob=0.4){
 	if(Math.random()<prob)
 		return this.baseColor;
 	else
 		return Math.floor(Math.random()*7)+1
 }
 
-Alien.prototype.mutateCA = function(repairColor,prob=0.5){
+
+Alien2.prototype.mutateCA = function(repairColor,prob=0.5){
 	grid2 = [];
 	for(let r=0;r<8;r++){
 		let row=[];
@@ -169,11 +212,11 @@ Alien.prototype.mutateCA = function(repairColor,prob=0.5){
 		grid2.push(row)
 	}
 
-	return new Alien(this.X,this.y,this.baseColor,grid2)
+	return new Alien2(this.x,this.y,this.baseColor,grid2)
 }
 
 //mutate with cellular automata but ensure there is enough pixels left in the sprite
-Alien.prototype.safeMutate = function(perc=0.5){
+Alien2.prototype.safeMutate = function(perc=0.5){
 	let newAlien = this.mutateCA(this.newPart());
 	//add the face back
 	for(let r=1;r<4;r++){
@@ -199,15 +242,19 @@ Alien.prototype.safeMutate = function(perc=0.5){
 }
 
 //remove a random chunk (circular) using binary operations
-Alien.prototype.remove = function(X,y,bullet){
+Alien2.prototype.remove = function(x,y,bullet){
 	let s = bullet.length; //assume circular bullet
-	for(let r=0;r<s;r++){
-		for(let c=0;c<s;c++){
-			if(bullet[r][c] == 1)
+	for(let r=0;r<4;r++){
+		for(let c=0;c<4;c++){
+			if(bullet[r][c] == 1){
+				console.log("hey")
 				continue
-			let x2 = X+c;
+			}
+			let x2 = x+c;
 			let y2 = y+r;
+			//console.log(`${y2},${x2} -> ${r},${c}`)
 			if(x2<8 && x2>=0 && y2<8 && y2>=0 && this.grid[y2][x2]!=8){
+				// this.grid[y2][x2] = 8;
 				this.grid[y2][x2] = 0;  //delete or keep the pixel
 			}
 		}
@@ -215,77 +262,147 @@ Alien.prototype.remove = function(X,y,bullet){
 }
 
 //rebuild from a chunk blown off
-Alien.prototype.rebuild = function(X,y,bullet,repairColor){
+Alien2.prototype.rebuild = function(X,y,bullet){
+	let repairColor = this.newPart()
 	let s = bullet.length; //assume circular bullet
-	for(let r=-1;r<s+1;r++){
-		for(let c=-1;c<s+1;c++){
+	for(let r=0;r<s+1;r++){
+		for(let c=0;c<s+1;c++){
 			let x2 = X+c;
 			let y2 = y+r;
 			if(x2<8 && x2>=0 && y2<8 && y2>=0 && this.grid[y2][x2]!=8){
+				let v = this.grid[y2][x2]
 				let f = 0;
 				let nnei = this.ctNei(y2,x2);
 				if(nnei > 0 && nnei < 4){   //more likely to add than delete a pixel
-					f = (0.5 < Math.random() ? (Math.random() < 0.3 ? this.baseColor : repairColor) : 0)
+					f = (0.7 < Math.random() ? (Math.random() < 0.6 ? this.baseColor : repairColor) : v)
 					//row.push(Math.floor(Math.random()*9))
 				}else if(nnei == 4 || nnei == 0){
-					f = 0;
+					f = v;
 				}
-				this.grid[y2][x2] = f;
+				this.grid[y2][x2] = f
 			}
 		}
 	}
 }
 
+//check if bounding box overlapped
+Alien2.prototype.canHit = function(barrel){
+	let rw = PX_SIZE*8;
+	let rh = PX_SIZE*8;
+	let rx = this.x + PX_SIZE*4;
+	let ry = this.y + PX_SIZE*4;
+	let cx = Math.abs(barrel.x - rx)
+	let cy = Math.abs(barrel.y - ry)
+
+	if (cx > (rw/2 + barrel.r)){
+		return false
+	}
+	if (cy > (rh/2+barrel.r)){
+		console.log()
+		return false
+	}
+
+	if (cx <= rw/2)
+		return true;
+	if (cy <= rh/2)
+		return true;
+
+	let cd = Math.pow((cx - rw/2),2) + Math.pow((cy-rh/2),2)
+	return cd <= Math.pow(barrel.r,2)
+
+}
+
+//get the relative center position of an object
+Alien2.prototype.relPos = function(t){
+	return {x:Math.floor((t.x-this.x)/PX_SIZE),y:Math.floor((t.y-this.y)/PX_SIZE)}
+}
 
 
 sketches["spriteshot"] = {
 	id: "spriteshot",
 	desc: "Example things!",
 	alien:null,
+	overlapping:false,
 	init(p) {
 		console.log("INIT SKETCH", this.id)
-		this.alien = new Alien(p.width/2-64,p.height/2-64,4,BASE_DESIGN);
+		// this.alien = new Alien2(p.width/2,p.height/2,4,BASE_DESIGN);
+		this.alien = new Alien2(p.width/2,p.height/2,4,BASE_DESIGN);
 	},
 
 	//randomly remove parts of the alien
 	randRemove(){
-		let x = Math.floor(Math.random()*10)-2;
-		let y = Math.floor(Math.random()*10)-2;
+		// let x = Math.floor(Math.random()*10)-2;
+		// let y = Math.floor(Math.random()*10)-2;
 		// let x = 3;
 		// let y = 2;
-		// let x = 0;
-		// let y = 0;
+		let x = 0;
+		let y = 0;
 		console.log(`BANG!: ${x},${y}`)
-		this.alien.remove(x,y,BULLET);
+		this.alien.remove(x,y,BULLET2);
 	},
 
 	randShootandFix(){
 		let x = Math.floor(Math.random()*10)-2;
 		let y = Math.floor(Math.random()*10)-2;
-		console.log(`BANG!: ${x},${y}`)
-		this.alien.remove(x,y,BULLET);
-		this.alien.rebuild(x,y,BULLET,this.alien.newPart());
+		console.log(`BANG and FIX!: ${x},${y}`)
+		this.alien.remove(x,y,BULLET2);
+		this.alien.rebuild(x,y,BULLET2);
+	},
+
+	pow(mx,my){
+		let target = {x:mx,y:my-20,r:16}
+		if(!this.alien.canHit(target)){
+			console.log("MISS!");
+			return
+		}
+		apos = this.alien.relPos(target)
+		this.alien.tx = apos.x;
+		this.alien.ty = apos.y;
+		console.log(`BANG BANG!: ${apos.x},${apos.y}`)
+		this.alien.remove(apos.x,apos.y,BULLET2)
+		
+	},
+
+
+	inRange(X,Y){
+		let target = {x:X,y:Y-20,r:16}
+		return this.alien.canHit(target)
 	},
 
 
 	draw(p, t, dt) {
 		
-		let X = 30;
-		let y = 40;
+		// let X = 30;
+		// let y = 40;
+		let xo = 0;
+		let yo = 0;
 
-		//
 		p.background(359)
-		for(let r=0;r<8;r++){
-			for(let c=0;c<8;c++){
-				let v = this.alien.grid[r][c]
-				if (v == 0)  //skip transparent
-					continue
-				if (isNaN(v))
-					v = this.alien.baseColor
-				p.fill(COLORS[v]);
-				p.stroke("#000000")
-				p.rect(X+c*PX_SIZE,y+r*PX_SIZE,PX_SIZE,PX_SIZE);
-			}
+
+		//draw some aliens
+		p.push()
+		p.translate()
+		this.alien.draw(p)
+		p.pop()
+
+
+		//draw the gun
+		let xp = p.mouseX-5;
+		let yp = p.mouseY+5;
+
+		p.textSize(16);
+		p.fill(0)
+		p.text("X",xp,yp);
+		p.strokeWeight(2);
+		p.fill(359,100,50,0.2)
+		p.ellipse(p.mouseX,p.mouseY,16*2);
+
+		this.overlapping = this.inRange(xp,yp);
+		p.fill(0)
+		p.text(`${this.alien.tx},${this.alien.ty}`,this.alien.x+5*PX_SIZE,this.alien.y+12*PX_SIZE)
+
+		if(p.mouseIsPressed){
+			this.pow(xp,yp);
 		}
 
 	}

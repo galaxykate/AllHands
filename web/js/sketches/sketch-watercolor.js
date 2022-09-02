@@ -56,8 +56,9 @@ sketches["watercolor"] = {
 	draw(p, t, dt) {
 		this.frame += 1
 		// p.background(0)
-		p.fill(0, 0, 0, .02)
-		p.rect(0, 0, p.width, p.height)
+		p.fill(0, 0, 0, .04)
+		if (Math.random() < .1)
+			p.rect(0, 0, p.width, p.height)
 
 
 		//-------------------------------

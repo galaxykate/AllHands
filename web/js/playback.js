@@ -4,6 +4,7 @@
 
 class Finger {
 	constructor() {
+		this.pointingVector = new Vector(0,0)
 		this.joints = []
 		for (var i = 0; i < 4; i++) {
 			this.joints[i] = new Vector(Math.random()*100, Math.random()*100)
@@ -13,6 +14,13 @@ class Finger {
 		this.fingerTip = this.joints[3]
 	}
 
+	get angle() {
+		return this.pointingVector.angle
+	}
+
+	update() {
+		this.pointingVector.setToDifference(this.joints[3], this.joints[2])
+	}
 }
 
 class Hand {
@@ -60,7 +68,10 @@ class Hand {
  					setPt(finger.joints[i], pt)
  				}
  			}
+ 			finger.update()
  		})
+
+
  	}
 }
 

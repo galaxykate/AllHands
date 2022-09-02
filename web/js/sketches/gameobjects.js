@@ -25,7 +25,7 @@ class GameObject {
 class FloorController extends GameObject {
 	points = []
 	bodies = []
-	height = 0.5
+	height = 1
 	width
 	numOfFingers = 10
 
@@ -83,17 +83,18 @@ class PlayerController extends GameObject {
 		var pos = this.box.getPosition()
 		this.x = pos.x
 		this.y = pos.y
-
+		this.box.setAwake(true)
 		if (p.keyIsDown(p.LEFT_ARROW)) {
-			this.box.setAwake(true)
 			this.box.applyLinearImpulse(Vec2(-this.speed * dt, 0), pos)
 			//this.box.applyAngularImpulse(-this.speed * dt)
 		}
 		if (p.keyIsDown(p.RIGHT_ARROW)) {
-			this.box.setAwake(true)
 			//this.box.applyAngularImpulse(this.speed * dt)
 			this.box.applyLinearImpulse(Vec2(this.speed * dt, 0), pos)
 		}
+
+		if (this.y > screenSpace.y)
+			this.box.setPosition(Vec2(this.x, 2));
 	}
 
 	draw(p) {
