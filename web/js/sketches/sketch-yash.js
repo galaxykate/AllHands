@@ -28,9 +28,18 @@ Vue.component("controls-yash", {
 			
 					},
 		c_music(){
-			const tune = this.sketch.sounds[5]+40
+			// const tune = this.sketch.sounds[5]+40
 			const note = Tone.Time(this.sketch.freq).toNotation() 
-			this.sketch.synth.setNote(Tone.Midi(tune).toMidi(), note);
+			const now = Tone.now()
+			const tune = this.sketch.sounds_x[0]
+
+			// this.sketch.synth.triggerAttack(Tone.Frequency(tune, "midi").toNote())
+			// this.sketch.synth.triggerAttack(Tone.Midi(Tone.Frequency(tune, "midi").toNote()).transpose(3))
+			// this.sketch.synth.triggerAttack(Tone.Midi(Tone.Frequency(tune, "midi").toNote()).transpose(6))
+			// this.sketch.synth.triggerAttack(Tone.Midi(Tone.Frequency(tune, "midi").toNote()).transpose(9))
+			// this.sketch.synth.releaseAll(now + this.sketch.freq);
+			synth.setNote("F#6");
+			
 		}			
 	},
 	props: ["app", "sketch"]
@@ -48,6 +57,11 @@ Vue.component("debug-yash", {
 				{{pt.toFixed(2)}}
 			</div>
 		</div>
+		<div>
+			<div  v-for="pt in sketch.sounds_x">
+				{{pt.toFixed(2)}}
+			</div>
+		</div>
 	</div>`,
 	props: ["app","sketch"]
 })
@@ -57,13 +71,22 @@ sketches["yash"] = {
 	id: "yash",
 	desc: "Example things!",
 	soundNum: 40,
-	freq: 0.4,
+	freq: 0.3,
 	sounds: [],
+	sounds_x: [],
+	music: [],
 	synth : new Tone.Synth().toDestination(),
+
 	init(p) {
 		console.log("INIT SKETCH", this.id)
 		for(var i=0; i<10; i++){
 			this.sounds.push(20*i)
+		}
+		for(var i=0; i<10; i++){
+			this.sounds_x.push(20*i)
+		}
+		for(var i=0; i<30; i++){
+			
 		}
 	},
 	draw(p, t, dt) {
@@ -78,11 +101,12 @@ sketches["yash"] = {
 
 		app.hands.forEachHand((hand, handIndex) => {
 				hand.forEachFinger((finger, fingerIndex) => {
-					var samp = finger.fingerTip.v[1] - hand.wrist.v[1]
-					samp=(samp+(p.height/2))*127/p.height
 					
+					var samp_x = finger.fingerTip.v[1]
+					samp_x=(samp_x+(p.height/2))*20/p.height + 50
+
 				this.sounds[fingerIndex+handIndex*5] = samp
-				// Vue(this.sounds[fingerIndex+handIndex*5],samp)
+				this.sounds_x[fingerIndex+handIndex*5] = samp_x
 				
 				p.noFill()
 				p.strokeWeight(1)
