@@ -1,5 +1,6 @@
 
 Vue.component("controls-yash", {
+	
 	template: `<div>
 
 		<button @click="chaos">😭</button>
@@ -12,30 +13,24 @@ Vue.component("controls-yash", {
 		},
 		chaos() {
 			console.log("CHAOS")
-			// const synth = new Tone.PolySynth(Tone.Synth).toDestination();
-			// const now = Tone.now()
-			// synth.triggerAttack("D4", now);
-			// synth.triggerAttack("F4", now + 0.5);
-			// synth.triggerAttack("A4", now + 1);
-			// synth.triggerAttack("C5", now + 1.5);
-			// synth.triggerAttack("E5", now + 2);
-			// synth.triggerRelease(["D4", "F4", "A4", "C5", "E5"], now + 4);
+
 			context = new AudioContext();
 			context.resume()
 
+			// var synth = new Tone.AMSynth().toDestination()
+
+			const note = Tone.Time(this.sketch.freq).toNotation() 
+			const tune = this.sketch.soundNum
+
+			this.sketch.synth.triggerAttack(Tone.Midi(tune).toMidi(), note)
 
 			var intervalId = window.setInterval(this.c_music, this.sketch.freq*1000);
 			
-		
 					},
 		c_music(){
-			const synth = new Tone.AMSynth().toDestination()
-
+			const tune = this.sketch.sounds[5]+40
 			const note = Tone.Time(this.sketch.freq).toNotation() 
-			const tune = this.sketch.sounds[0]
-
-			synth.triggerAttackRelease(Tone.Midi(tune).toMidi(), note)
-
+			this.sketch.synth.setNote(Tone.Midi(tune).toMidi(), note);
 		}			
 	},
 	props: ["app", "sketch"]
@@ -64,6 +59,7 @@ sketches["yash"] = {
 	soundNum: 40,
 	freq: 0.4,
 	sounds: [],
+	synth : new Tone.Synth().toDestination(),
 	init(p) {
 		console.log("INIT SKETCH", this.id)
 		for(var i=0; i<10; i++){
@@ -82,11 +78,11 @@ sketches["yash"] = {
 
 		app.hands.forEachHand((hand, handIndex) => {
 				hand.forEachFinger((finger, fingerIndex) => {
-
-				var samp = finger.fingerTip.v[1]
-				samp=(samp+(p.height/2))*127/p.height
+					var samp = finger.fingerTip.v[1] - hand.wrist.v[1]
+					samp=(samp+(p.height/2))*127/p.height
 					
 				this.sounds[fingerIndex+handIndex*5] = samp
+				// Vue(this.sounds[fingerIndex+handIndex*5],samp)
 				
 				p.noFill()
 				p.strokeWeight(1)
