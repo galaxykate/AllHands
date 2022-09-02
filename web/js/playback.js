@@ -178,7 +178,7 @@ Vue.component("playback", {
 
 
 		<!-- PLAYBACK UI -->
-		<div  class="section">
+		<div  class="section"  v-if="false">
 			<span class="label">Play recording</span>
 			<select v-model="recordingID">
 				<option v-for="id in Object.keys(recordedHandData)">{{id}}</option>
@@ -192,7 +192,7 @@ Vue.component("playback", {
 		</div>
 
 		<!-- RECORDING UI -->
-		<div  class="section">
+		<div  class="section" v-if="false">
 			<span class="label">Record as</span>
 			<input v-model="recordingID" />
 			<button class="emoji-button" @click="toggleRecording">

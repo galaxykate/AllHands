@@ -3,7 +3,7 @@ Vue.component("controls-catcradle", {
 	template: `<div>
 
 		
-		<input type="color" />
+		
 	</div>`,
 	methods: {
 		
@@ -14,7 +14,7 @@ Vue.component("controls-catcradle", {
 Vue.component("debug-catcradle", {
 	template: `<div>
 
-		<h3>Watercolors</h3>
+		
 		
 	</div>`,
 	props: ["app", "sketch"]
