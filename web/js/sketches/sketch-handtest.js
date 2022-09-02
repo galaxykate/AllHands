@@ -45,30 +45,56 @@ sketches["handtest"] = {
 		p.push()
 		p.translate(p.width/2, p.height/2)
 		app.hands.forEachHand((hand, handIndex) => {
+			p.noStroke()
 			p.fill(handIndex*100, 100, 50)
-			hand.data.forEach(v => {
+			hand.data.forEach((v,vIndex) => {
 				// console.log(v)
 				p.circle(...v, 5)
+				p.fill(0)
+				p.text(vIndex, ...v)
 			})
 
 			hand.data.slice(0,5).forEach(v => {
 				p.noFill()
 				p.circle(...v, 15)
+
+				p.fill(0)
+
 			})
 		})
 
+		
+
+
+
+		app.hands.forEachHand((hand, handIndex) => {
+			// Draw as circles
+			hand.forEachFinger((finger, fingerIndex) => {
+				p.noStroke()
+				p.fill(fingerIndex*20 + 150*handIndex, 100, 50, .4)
+				finger.joints.forEach((joint, jointIndex) => {
+					joint.draw(p, 10)
+
+				})
+			}) 
+
+			// Draw as tube
+			hand.forEachFinger((finger, fingerIndex) => {
+				p.strokeWeight(10)
+				p.noFill()
+				p.stroke(fingerIndex*20 + 150*handIndex, 100, 50, 1)
+				p.beginShape()
+				finger.joints.forEach((joint, jointIndex) => {
+					joint.vertex(p)
+					// joint.draw(p, 10)
+				})
+				p.endShape()
+			}) 
+			p.noStroke()
+				
+		})
+
 		p.pop()
-
-
-
-		// app.hands.forEachHand((hand, handIndex) => {
-		// 	hand.forEachFinger((finger, fingerIndex) => {
-		// 		p.fill(fingerIndex*10, )
-		// 		finger.joints.forEach((joint, jointIndex) => {
-		// 			p.circle(...j, 50 - jointIndex*5)
-		// 		})
-		// 	}) 
-		// })
 	}
 
 }
