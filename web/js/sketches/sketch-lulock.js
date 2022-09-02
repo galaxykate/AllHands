@@ -1,6 +1,6 @@
 
 Vue.component("controls-lulock", {
-	template: `<div>LULOCKS TEST CONTROLS HERE</div>
+	template: `<div>LULOCKS TEST CONTROLS HERE
 	<button @click="chaos">😭</button>
 	<input type="range" v-model="sketch.forceMultiplier" />
 	<input type="color" />
