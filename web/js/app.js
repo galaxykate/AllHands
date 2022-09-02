@@ -17,107 +17,13 @@ const canvasH = 480
 
 
 
-let controls = {
-
-	startMask: "theater",
-	paused: false,
-	playingRecordedData: true,
-	playingFrame: 0,
-	recording: false,
-
-	maskOffset: new Vector(0,0),
-	maskZoom: 1,
-}
-
 let app = {
-	
-	// Recording and playback for hand-data
-	playback: {
-		paused: false,
-		step: 0,
-		fps: 20,
-		id: "test"
-	},
-	recordedHandData: {
-		test: testHandData
-	},
+	paused: false,
 
+	hands: new Hands(),
+	
 	// Location of the mouse
 	mouse: new Vector(),
-
-
-	
-
-	// draw(p) {
-		
-	// 	p.push()
-	// 	p.translate(p.width/2, p.height/2)
-		
-
-	// 	// Set the relative offset based on the current offset
-	// 	// console.log(app.mouse)
-	// 	let relOffset = Vector.add(controls.maskOffset, app.mouse.dragOffset)
-	// 	relOffset.mult(-1)
-	// 	controls.zoom = (SLIDER.zoom*8)**1.5 + 1
-
-	// 	p.scale(controls.zoom, controls.zoom)
-	// 	p.translate(...relOffset)
-
-	// 	let t = p.millis()*.001
-	// 	let dt = p.deltaTime*.001
-		
-		
-	// 	if (app.maskFxn) {
-	// 		if (!controls.paused)
-	// 			app.maskFxn(p)
-	// 	}
-
-	// 	if (app.maskInstance) {
-	// 		if (!controls.paused)
-	// 			app.maskInstance.update(t, dt, p.frameCount, p)	
-	// 		app.maskInstance.draw(p)	
-	// 	}
-	
-		
-		
-	// },
-
-	// updateFace(p) {
-		
-	// 	// Run some update code every frame
-
-	// 	// If we are recording, 
-	// 	//   push a copy of the current face/hand points onto the recording data
-	// 	if (controls.recording) {
-	// 		app.recordingData.face.push(face.points.map(pt => pt.slice(0)))
-
-	// 		let handData = hand.map(h => h.points.map(pt => pt.slice(0)))
-	// 		app.recordingData.hand.push(handData)
-	// 	} 
-
-	// 	// If we are *playing* recorded data, 
-	// 	//  use the current frame of the recorded data to set the hands/face
-	// 	if (controls.playingRecordedData) {
-			
-	// 		if (!controls.paused && p.frameCount%3 == 1) {
-	// 			controls.playingFrame++
-	// 			// console.log(frame)
-	// 			let frame = controls.playingFrame%testFaceData.length
-	// 			let faceData = testFaceData[frame]
-	// 			face.points.forEach((pt,i) => pt.copy(faceData[i]))
-				
-	// 			let handData = testHandData[frame]
-	// 			hand.forEach((h,index) => {
-	// 				h.points.forEach((pt,i) => pt.copy(handData[index][i]))
-	// 			})
-
-				
-	// 			calculateMetaTrackingData()
-	// 		}
-	// 	} else {
-	// 		// Currently using Handsfree, its updated on its own schedule
-	// 	}
-	// }
 }
 
 
@@ -135,12 +41,22 @@ document.addEventListener("DOMContentLoaded", function(){
 	new Vue({
 		el : "#app",
 		template: `<div id="app" >
-			<div class="header">
-					-- meta controls here --
-
+			<div class="header app-header">
+				
+				<!-- SKETCH SELECTOR -->
+				<div class="header-section">
+					<span class="label">Select sketch</span>
 					<select v-model="currentID">
 						<option v-for="id in sketchIDs">{{id}}</option>
 					</select>
+				</div>
+
+				<playback />
+			
+				<!-- SPEED/PAUSE UI -->
+				<div  class="header-section">
+					<span v-if="app.paused">paused</span>
+				</div>
 			</div>
 
 			<div id="main-columns"> 
@@ -189,7 +105,8 @@ document.addEventListener("DOMContentLoaded", function(){
 				// Save the noise fxn
 				noise = p.noise
 				// Save a mouse position
-				
+
+
 				
 				// Basic P5 setup
 				p.setup = () => {
@@ -205,11 +122,15 @@ document.addEventListener("DOMContentLoaded", function(){
 				//-------------------------------------------
 				// Draw
 
-				let recordedFrame = 0
-
+			
 				p.draw = () => {
+					// TIME
 					let t = p.millis()*.001
 					let dt = p.deltaTime*.001
+
+					// HAND PLAYBACK
+				
+
 					// Draw whatever the current's drawing is
 					if (this.current.draw) {
 						
@@ -256,7 +177,7 @@ document.addEventListener('keydown', function(e){
 		Vue.set(app, "shiftSelected", [])
 	}
 	if (e.code === "Space") {
-		controls.paused = !controls.paused
-		console.log("paused", controls.paused)
+		app.paused = !app.paused
+		console.log("paused", app.paused)
 	}
 });

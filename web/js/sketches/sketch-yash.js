@@ -1,7 +1,28 @@
 
 Vue.component("controls-yash", {
-	template: `<div>MY yash CONTROLS HERE</div>`,
-	props: ["app"]
+	template: `<div>
+
+		<button @click="chaos">😭</button>
+		<input type="range" v-model="sketch.forceMultiplier" />
+		<input type="color" />
+	</div>`,
+	methods: {
+		togglePause() {
+
+		},
+		chaos() {
+			console.log("CHAOS")
+			const synth = new Tone.PolySynth(Tone.Synth).toDestination();
+const now = Tone.now()
+synth.triggerAttack("D4", now);
+synth.triggerAttack("F4", now + 0.5);
+synth.triggerAttack("A4", now + 1);
+synth.triggerAttack("C5", now + 1.5);
+synth.triggerAttack("E5", now + 2);
+synth.triggerRelease(["D4", "F4", "A4", "C5", "E5"], now + 4);
+		}
+	},
+	props: ["app", "sketch"]
 })
 
 Vue.component("debug-yash", {
