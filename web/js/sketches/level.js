@@ -17,6 +17,12 @@ function createLevel(world)
 function win()
 {
     console.log("You win!")
+    textSize(32);
+    text('You Win!', 10, 30);
+    fill(0, 102, 153);
+    text('You Win!', 10, 60);
+    fill(0, 102, 153, 51);
+    text('You Win!', 10, 90);
 }
 
 function sortFunction(a, b){
