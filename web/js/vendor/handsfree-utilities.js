@@ -231,6 +231,7 @@ function initHandsFree() {
 		// From the handsfree demos (mostly)
 		handsfree = new Handsfree({
 			showDebug: true,
+			maxNumHands: 4,
 			hands: true
 		})
 		console.log("Finished initializing handsfree, stop recorded data")
