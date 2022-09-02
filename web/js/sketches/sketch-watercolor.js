@@ -31,7 +31,7 @@ sketches["watercolor"] = {
 	points: [],
 	init(p) {
 		console.log("INIT SKETCH", this.id)
-
+		p.background(0)
 
 		// Particles!
 		for (var i = 0; i < 10; i++) {
