@@ -135,7 +135,7 @@ sketches["watercolor"] = {
 				p.noStroke()
 				let hue = (baseHue + fingerIndex*20 + handIndex*120)%360
 				let pt = finger.fingerTip
-				console.log(pt)
+				// console.log(pt)
 				for (var i = 0; i < 10; i++) {
 					let r = 3 + 8*Math.random()
 					p.noStroke()

@@ -209,7 +209,7 @@ Vue.component("playback", {
 	mounted() {
 
 		this.step = 50
-		console.log(this.playbackData)
+		// console.log(this.playbackData)
 		app.hands.setFromFrame(this.playbackData[10])
 
 		// When to increment the hand data
