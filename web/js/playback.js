@@ -2,11 +2,26 @@
  * Playback and recording for the handtracking
  **/
 
+class Finger {
+	constructor() {
+		this.joints = []
+		for (var i = 0; i < 4; i++) {
+			this.joints[i] = new Vector(Math.random()*100, Math.random()*100)
+		}
+
+		this.fingerTip = this.joints[3]
+	}
+
+}
 
 class Hand {
 	constructor() {
 		this.data = []	
-		
+		this.fingers = []
+		this.wrist = new Vector(0,0)
+		for (var i = 0; i < 5; i++) {
+			this.fingers[i] = new Finger()
+		}
 
 
 	}
@@ -17,6 +32,14 @@ class Hand {
  	setFromFrame(data) {
  		this.data = data
  		// console.log(data.length)
+ 		this.wrist.setTo(data[0])
+ 		// First 5 are thumb
+ 		this.fingers.forEach((finger,fingerIndex) => {
+ 			for (var i = 0; i < finger.joints.length; i++) {
+ 				let i2 = i + fingerIndex*4 + 1
+ 				finger.joints[i].setTo(data[i2])
+ 			}
+ 		})
  	}
 }
 
@@ -43,7 +66,7 @@ class Hands {
  		// Ok, we have N hands
  		for (var i = 0; i < data.length; i++) {
  			if (this.hands.length -1 < i) {
- 				console.log("Not enough hands")
+ 				console.log("Not enough hands for data, adding hand #", this.hands.length)
  				this.hands.push(new Hand())
  			}
  			let hand = this.hands[i]
@@ -136,9 +159,11 @@ Vue.component("playback", {
 
 		// When to increment the hand data
 		setInterval(() => {
-			this.step += 1
-			this.step %= this.playbackData.length
-			app.hands.setFromFrame(this.playbackData[this.step])
+			if (!app.paused) {
+				this.step += 1
+				this.step %= this.playbackData.length
+				app.hands.setFromFrame(this.playbackData[this.step])
+			}
 		}, 100) 
 				
 	},

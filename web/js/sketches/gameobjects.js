@@ -32,21 +32,24 @@ class PlayerController extends GameObject {
 		var pl = planck, Vec2 = pl.Vec2;
 		super(initX, initY)
 		this.box = world.createBody().setDynamic()
-		this.box.createFixture(pl.Box(this.width*0.5, this.height*0.5));
-		this.box.setPosition(Vec2(this.x, this.y));
+		this.box.createFixture(pl.Box(this.width * 0.5, this.height * 0.5));
+		this.box.setPosition(Vec2(this.x + (this.width * 0.5), this.y + (this.height * 0.5)));
 		this.box.setMassData({ mass : 1, center : Vec2(), I : 1})
 	}
 
 	update(p, dt) {
+		var pl = planck, Vec2 = pl.Vec2;
 		var pos = this.box.getPosition()
-		this.x = pos.x
-		this.y = pos.y
+		this.x = pos.x - this.width * 0.5
+		this.y = pos.y - this.height * 0.5
 
 		if (p.keyIsDown(p.LEFT_ARROW)) {
-			this.box.setLinearVelocity(pl.Vec2(-this.speed * dt, 0))
+			this.box.setAwake(true)
+			this.box.applyLinearImpulse(Vec2(-this.speed * dt, 0), pos)
 		}
 		if (p.keyIsDown(p.RIGHT_ARROW)) {
-			this.box.setLinearVelocity(pl.Vec2(this.speed * dt, 0))
+			this.box.setAwake(true)
+			this.box.applyLinearImpulse(Vec2(this.speed * dt, 0), pos)
 		}
 	}
 
@@ -69,13 +72,13 @@ class Platform extends GameObject {
 		this.width = width
 		this.height = height
 		this.body = world.createBody()
-		this.body.createFixture(pl.Box(width*0.5, height))
-		this.body.setPosition(Vec2(this.x, this.y))
+		this.body.createFixture(pl.Box(width*0.5, height*0.5))
+		this.body.setPosition(Vec2(this.x + (width*0.5), this.y + (height*0.5)))
 	}
 
 	draw(p) {
-		var dx = p.width / screenSpace.x 
-		var dy = p.height / screenSpace.y
+		var dx = p.width / screenSpace.x
+		var dy = p.height / screenSpace.y 
 		p.fill(30)
 		p.rect(this.x * dx, this.y * dy, this.width * dx, this.height * dy)
 	}
