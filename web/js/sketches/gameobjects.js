@@ -78,6 +78,7 @@ class PlayerController extends GameObject {
 	box
 	size = 1
 	speed = 10
+	won = false
 
 	constructor(initX, initY, world) {
 		var pl = planck, Vec2 = pl.Vec2;
@@ -95,6 +96,8 @@ class PlayerController extends GameObject {
 	}
 
 	update(p, dt) {
+		if (won)
+			win(p)
 		var pl = planck, Vec2 = pl.Vec2;
 		var pos = this.box.getPosition()
 		this.x = pos.x
@@ -123,7 +126,7 @@ class PlayerController extends GameObject {
 	collision(collider) {
 		if (collider instanceof Platform)
 			if (collider.goal)
-				win();
+				won = true
 	}
 }
 
