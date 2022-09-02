@@ -19,7 +19,9 @@ sketches["suenje"] = {
 		this.gameObjects.push(player);
 		var platform = new Platform(1, 20, 23, 1, this.world)
 		this.gameObjects.push(platform);
-		var obsticale = new Platform(20, 40, 2, 1, this.world)
+		this.gameObjects.push(obsticale(5, 15, 3, 1, this.world));
+		this.gameObjects.push(obsticale(5, 15, 3, 1, this.world));
+		//createLevel();
 	},
 	draw(p, t, dt) {
 		// Update
