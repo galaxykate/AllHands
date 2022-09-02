@@ -44,9 +44,11 @@ class PlayerController extends GameObject {
 		this.y = pos.y - this.height * 0.5
 
 		if (p.keyIsDown(p.LEFT_ARROW)) {
+			this.box.setAwake(true)
 			this.box.applyLinearImpulse(Vec2(-this.speed * dt, 0), pos)
 		}
 		if (p.keyIsDown(p.RIGHT_ARROW)) {
+			this.box.setAwake(true)
 			this.box.applyLinearImpulse(Vec2(this.speed * dt, 0), pos)
 		}
 	}
