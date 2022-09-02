@@ -96,7 +96,7 @@ class PlayerController extends GameObject {
 	}
 
 	update(p, dt) {
-		if (won)
+		if (this.won)
 			win(p)
 		var pl = planck, Vec2 = pl.Vec2;
 		var pos = this.box.getPosition()
@@ -113,7 +113,7 @@ class PlayerController extends GameObject {
 		}
 
 		if (this.y > screenSpace.y)
-			this.box.setPosition(Vec2(this.x, 2));
+			this.box.setPosition(Vec2(2, 2));
 	}
 
 	draw(p) {
@@ -126,7 +126,11 @@ class PlayerController extends GameObject {
 	collision(collider) {
 		if (collider instanceof Platform)
 			if (collider.goal)
-				won = true
+			{
+				this.won = true
+				this.box.setPosition(planck.Vec2(2, 2));
+			}
+				
 	}
 }
 

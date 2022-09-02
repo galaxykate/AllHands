@@ -3,9 +3,7 @@ Vue.component("controls-yash", {
 	
 	template: `<div>
 
-		<button @click="chaos">😭</button>
-		<input type="range" min = "1" max ="127" v-model="sketch.soundNum" />
-		<input type="color" />
+		<button @click="chaos">PLAY!!</button>
 	</div>`,
 	methods: {
 		togglePause() {
@@ -44,21 +42,11 @@ Vue.component("controls-yash", {
 
 Vue.component("debug-yash", {
 	template: `<div>
+		sounds!! music..??
 
-		MY KATE DEBUG HERE!!!!!
-		<h3>ID: {{sketch.id}}</h3>
+		left hand to change pitches, right hand to change harmonies
+
 		{{sketch.frame}}
-		<div>sn: {{sketch.soundNum}}</div>
-		<div>
-			<div  v-for="pt in sketch.sounds">
-				{{pt.toFixed(2)}}
-			</div>
-		</div>
-		<div>
-			<div  v-for="pt in sketch.sounds_x">
-				{{pt.toFixed(2)}}
-			</div>
-		</div>
 	</div>`,
 	props: ["app","sketch"]
 })
@@ -102,7 +90,7 @@ sketches["yash"] = {
 					samp_x = samp_x*90/p.width
 
 					var samp = finger.fingerTip.v[1]
-					samp = samp*5/p.height
+					samp = samp*6/p.height
 				this.sounds[fingerIndex+handIndex*5] = samp
 				this.sounds_x[fingerIndex+handIndex*5] = samp_x
 				
@@ -113,6 +101,71 @@ sketches["yash"] = {
 			}) 	
 				
 		})
+		p.background(100)
+		// p.fill(0, 0, 100, .1)
+		// p.rect(0, 0, p.width, p.height)
+
+		p.push()
+		// p.translate(p.width/2, p.height/2)
+
+		// console.log(app.hands)
+		// app.hands.forEachHand((hand, handIndex) => {
+		// 	p.noStroke()
+		// 	p.fill(handIndex*100, 100, 50)
+		// 	hand.data.forEach((v,vIndex) => {
+		// 		// console.log(v)
+		// 		p.circle(...v, 50)
+		// 		p.fill(0)
+		// 		p.text(vIndex, ...v)
+		// 	})
+		// })
+
+		
+
+
+
+		app.hands.forEachHand((hand, handIndex) => {
+			// Draw as circles
+			hand.forEachFinger((finger, fingerIndex) => {
+				finger.joints.forEach((joint, jointIndex) => {
+					
+					
+
+				})
+				p.strokeWeight(3)
+				finger.pointingVector.drawArrow({
+					p: p,
+					center: finger.fingerTip,
+				})
+				p.fill(0)
+				p.text("ANGLE" + finger.angle.toFixed(2), ...finger.fingerTip.v )
+			}) 
+		
+
+			// Draw as tube
+			hand.forEachFinger((finger, fingerIndex) => {
+				p.strokeWeight(10)
+				p.noFill()
+				p.stroke(fingerIndex*20 + 150*handIndex, 100, 50, 1)
+				p.beginShape()
+				finger.joints.forEach((joint, jointIndex) => {
+					joint.vertex(p)
+					// joint.draw(p, 10)
+				})
+				p.endShape()
+			}) 
+			p.noStroke()
+				
+			// Just fingertips
+			// hand.forEachFinger((finger, fingerIndex) => {
+			// 	p.noFill()
+			// 	p.strokeWeight(1)
+			// 	p.stroke(fingerIndex*20 + 150*handIndex, 100, 50, .4)
+			// 	finger.fingerTip.draw(p, 50)
+			// }) 
+		})
+
+		p.pop()
 
 		p.pop()
 	}

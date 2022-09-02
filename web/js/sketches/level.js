@@ -14,15 +14,15 @@ function createLevel(world)
     return gameObjectsLocal
 }
 
-function win()
+function win(p)
 {
     console.log("You win!")
-    textSize(32);
-    text('You Win!', 10, 30);
-    fill(0, 102, 153);
-    text('You Win!', 10, 60);
-    fill(0, 102, 153, 51);
-    text('You Win!', 10, 90);
+    p.textSize(32);
+    p.text('You Win!', 3, 15);
+    p.fill(0, 102, 153);
+    p.text('You Win!', 3, 20);
+    p.fill(0, 102, 153, 51);
+    p.text('You Win!', 3, 23);
 }
 
 function sortFunction(a, b){
