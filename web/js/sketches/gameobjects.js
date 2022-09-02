@@ -26,20 +26,22 @@ class FloorController extends GameObject {
 	points = []
 	bodies = []
 	height = 0.5
+	width
 	numOfFingers = 10
 
 	constructor(initX, initY, world) {
 		var pl = planck, Vec2 = pl.Vec2;
 		super(initX, initY)
-		
+		this.width = screenSpace.x / this.numOfFingers 
+
 		for (var i = 0; i < this.numOfFingers; ++i) {
 			var point = Vec2(initX + i * screenSpace.x / this.numOfFingers, initY - 5 * Math.random());
 			this.points.push(point)
 			var body = world.createBody();
 			this.bodies.push(body)
-			body.createFixture(planck.Box(screenSpace.x / this.numOfFingers * 0.5, this.height * 0.5));
-			body.setPosition(Vec2(point.x - this.width * 0.5, point.y - this.height * 0.5))
-		}				
+			body.createFixture(planck.Box(this.width * 0.5, this.height * 0.5));
+			body.setPosition(Vec2(point.x + this.width * 0.5, point.y + this.height * 0.5))
+		}
 	}
 
 	draw(p) {
@@ -51,8 +53,9 @@ class FloorController extends GameObject {
 	}
 
 	update(p, dt) {
+		var pl = planck, Vec2 = pl.Vec2;
 		for(var i = 0; i < this.bodies.length; i++){
-			this.bodies[i].setPosition(this.points[i])
+			this.bodies[i].setPosition(Vec2(this.points[i].x + this.width * 0.5, this.points[i].y + this.height * 0.5))
 		}
 		/*
 		for(var i = 0; i < this.points.length; i++)
