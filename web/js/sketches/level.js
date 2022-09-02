@@ -7,10 +7,10 @@ function obsticale(initX, initY, width, height, world, color, goal)
 function createLevel(world)
 {
     var gameObjectsLocal = []
-    gameObjectsLocal.push(obsticale(5, 15, 3, 1, world,'red', false));
-    gameObjectsLocal.push(obsticale(10, 12, 3, 1, world,'pink', false));
+    gameObjectsLocal.push(obsticale(5, 15, 3, 1, world, 'red', false));
+    gameObjectsLocal.push(obsticale(10, 12, 3, 1, world, 'pink', false));
     gameObjectsLocal.push(obsticale(15, 8, 3, 1, world, 'blue', false));
-    gameObjectsLocal.push(obsticale(20, 3, 3, 1, world,'green', true));
+    gameObjectsLocal.push(obsticale(20, 3, 3, 1, world, 'green', true));
     return gameObjectsLocal
 }
 
