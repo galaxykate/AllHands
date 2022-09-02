@@ -19,10 +19,10 @@ Vue.component("controls-yash", {
 
 			// var synth = new Tone.AMSynth().toDestination()
 
-			const note = Tone.Time(this.sketch.freq).toNotation() 
-			const tune = this.sketch.soundNum
+			// const note = Tone.Time(this.sketch.freq).toNotation() 
+			// const tune = this.sketch.soundNum
 
-			this.sketch.synth.triggerAttack(Tone.Midi(tune).toMidi(), note)
+			// this.sketch.synth.triggerAttack(Tone.Midi(tune).toMidi(), note)
 
 			var intervalId = window.setInterval(this.c_music, this.sketch.freq*1000);
 			
@@ -33,12 +33,10 @@ Vue.component("controls-yash", {
 			const now = Tone.now()
 			const tune = this.sketch.sounds_x[0]
 
-			// this.sketch.synth.triggerAttack(Tone.Frequency(tune, "midi").toNote())
-			// this.sketch.synth.triggerAttack(Tone.Midi(Tone.Frequency(tune, "midi").toNote()).transpose(3))
-			// this.sketch.synth.triggerAttack(Tone.Midi(Tone.Frequency(tune, "midi").toNote()).transpose(6))
-			// this.sketch.synth.triggerAttack(Tone.Midi(Tone.Frequency(tune, "midi").toNote()).transpose(9))
-			// this.sketch.synth.releaseAll(now + this.sketch.freq);
-			synth.setNote("F#6");
+			var tunee = Tone.Frequency( this.sketch.music[Math.floor(this.sketch.sounds_x[0])], "midi").toNote()
+			console.log(tunee)
+			this.sketch.synth.triggerAttackRelease([Tone.Midi(tunee).transpose(this.sketch.sounds[5])], note); // "C5");
+			// this.sketch.synth.releaseAll(now+note);
 			
 		}			
 	},
@@ -75,8 +73,7 @@ sketches["yash"] = {
 	sounds: [],
 	sounds_x: [],
 	music: [],
-	synth : new Tone.Synth().toDestination(),
-
+	synth : new Tone.PolySynth(Tone.Synth).toDestination(),
 	init(p) {
 		console.log("INIT SKETCH", this.id)
 		for(var i=0; i<10; i++){
@@ -86,7 +83,7 @@ sketches["yash"] = {
 			this.sounds_x.push(20*i)
 		}
 		for(var i=0; i<30; i++){
-			
+				this.music.push(i*3)
 		}
 	},
 	draw(p, t, dt) {
@@ -102,8 +99,12 @@ sketches["yash"] = {
 		app.hands.forEachHand((hand, handIndex) => {
 				hand.forEachFinger((finger, fingerIndex) => {
 					
-					var samp_x = finger.fingerTip.v[1]
-					samp_x=(samp_x+(p.height/2))*20/p.height + 50
+					var samp_x = finger.fingerTip.v[0]
+					samp_x = samp_x*30/p.width
+
+					var samp = finger.fingerTip.v[1]
+					samp = (p.height - samp)*30/p.height
+
 
 				this.sounds[fingerIndex+handIndex*5] = samp
 				this.sounds_x[fingerIndex+handIndex*5] = samp_x

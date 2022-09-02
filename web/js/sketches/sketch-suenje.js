@@ -12,7 +12,7 @@ sketches["suenje"] = {
 	id: "suenje",
 	desc: "Small platformer",
 	gameObjects: [],
-	floor,
+	floor:{},
 	init(p) {
 		console.log("INIT SKETCH", this.id)
 		this.world = planck.World(planck.Vec2(0, 10))
