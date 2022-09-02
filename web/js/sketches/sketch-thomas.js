@@ -33,7 +33,7 @@ sketches["thomas"] = {
 		var index = 0
 		app.hands.forEachHand((hand, handIndex) => {
 			hand.forEachFinger((finger, fingerIndex) => {
-				this.floor.points[index].y =  25*(finger.fingerTip.y / p.height) + 20
+				this.floor.points[index].y = 25*(finger.fingerTip.y / p.height)
 				index++
 			})
 		})
