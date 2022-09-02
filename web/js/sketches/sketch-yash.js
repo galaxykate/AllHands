@@ -3,7 +3,7 @@ Vue.component("controls-yash", {
 	template: `<div>
 
 		<button @click="chaos">😭</button>
-		<input type="range" v-model="sketch.forceMultiplier" />
+		<input type="range" min = "1" max ="127" v-model="sketch.soundNum" />
 		<input type="color" />
 	</div>`,
 	methods: {
@@ -12,40 +12,57 @@ Vue.component("controls-yash", {
 		},
 		chaos() {
 			console.log("CHAOS")
-			const synth = new Tone.PolySynth(Tone.Synth).toDestination();
-const now = Tone.now()
-synth.triggerAttack("D4", now);
-synth.triggerAttack("F4", now + 0.5);
-synth.triggerAttack("A4", now + 1);
-synth.triggerAttack("C5", now + 1.5);
-synth.triggerAttack("E5", now + 2);
-synth.triggerRelease(["D4", "F4", "A4", "C5", "E5"], now + 4);
-		}
+			// const synth = new Tone.PolySynth(Tone.Synth).toDestination();
+			// const now = Tone.now()
+			// synth.triggerAttack("D4", now);
+			// synth.triggerAttack("F4", now + 0.5);
+			// synth.triggerAttack("A4", now + 1);
+			// synth.triggerAttack("C5", now + 1.5);
+			// synth.triggerAttack("E5", now + 2);
+			// synth.triggerRelease(["D4", "F4", "A4", "C5", "E5"], now + 4);
+			context = new AudioContext();
+			context.resume()
+
+
+			var intervalId = window.setInterval(this.c_music, 1000);
+			
+		
+					},
+		c_music(){
+			const synth = new Tone.AMSynth().toDestination()
+
+			const note = Tone.Time(1).toNotation() 
+			const tune = this.sketch.soundNum
+
+			synth.triggerAttackRelease(Tone.Midi(tune).toMidi(), note)
+
+		}			
 	},
 	props: ["app", "sketch"]
 })
 
 Vue.component("debug-yash", {
-	template: `<div>MY yash DEBUG HERE!!!!!</div>`,
-	props: ["app"]
+	template: `<div>
+
+		MY KATE DEBUG HERE!!!!!
+		<h3>ID: {{sketch.id}}</h3>
+		{{sketch.frame}}
+		<div>sn: {{sketch.soundNum}}</div>
+	</div>`,
+	props: ["app","sketch"]
 })
 
 
 sketches["yash"] = {
 	id: "yash",
 	desc: "Example things!",
+	soundNum: 40,
 	init(p) {
 		console.log("INIT SKETCH", this.id)
-		//create a synth and connect it to the main output (your speakers)
-		// const synth = new Tone.Synth().toDestination();
 
-		//play a middle 'C' for the duration of an 8th note
-		// synth.triggerAttackRelease("C4", "8n");
-		// new AudioContext();
-
-		// const osc = new Tone.Oscillator(440, "sine").toDestination().start();
 	},
 	draw(p, t, dt) {
+
 		// p.background(0)
 		p.fill(0, 0, 0, 1)
 		p.rect(0, 0, p.width, p.height)
