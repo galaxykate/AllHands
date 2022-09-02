@@ -17,8 +17,14 @@ sketches["thomas"] = {
 		this.world = planck.World(planck.Vec2(0, 10))
 		var player = new PlayerController(2, 10, this.world)
 		this.gameObjects.push(player);
-		var platform = new Platform(1, 20, 23, 1, this.world)
-		this.gameObjects.push(platform);
+		//var platform = new Platform(1, 20, 23, 1, this.world)
+		//this.gameObjects.push(platform);
+		var floor = new FloorController(1, 24, this.world);
+		this.gameObjects.push(floor)
+		// Level bounds
+		this.gameObjects.push(new Platform(0, 0, 1, 25, this.world))
+		this.gameObjects.push(new Platform(24, 0, 1, 25, this.world))
+		this.gameObjects.push(new Platform(0, 0, 25, 1, this.world))
 	},
 	draw(p, t, dt) {
 		// Update
