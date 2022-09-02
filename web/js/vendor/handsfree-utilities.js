@@ -226,6 +226,7 @@ function initHandsFree() {
 	if (handsfree === undefined) {
 
 		console.log("Init handsfree....waiting...")
+		app.handsfreeStatus = 1
 		
 		// From the handsfree demos (mostly)
 		handsfree = new Handsfree({
@@ -233,20 +234,29 @@ function initHandsFree() {
 			hands: true
 		})
 		console.log("Finished initializing handsfree, stop recorded data")
-		controls.playingRecordedData = false
-
+		
 		handsfree.update({facemesh: true})
 
+		let readings = 0
 		// Let's create a plugin called "logger" to console.log the data
 		handsfree.use('logger', (data) => {
 			// Ignore HF if we are playing recorded data
-			if (!controls.playingRecordedData)
-				applyHandsFreeData(data)
+			app.handsfreeStatus = 2
+			readings++
+		
+			let handsFound = data.hands.landmarks?.filter(landmarks => landmarks.length > 0)
+			
+			if (handsFound.length > 0) {
+				app.handsfreeStatus = 3
+				app.hands.applyHandsFreeData(handsFound)
+			}
 		})
 
 
 		// Start webcam and tracking (personally, I always like to ask first)
 		handsfree.start()
+	} else {
+		console.warn("Handsfree already started")
 	}
 
 }

@@ -18,6 +18,16 @@ Vue.component("controls-handtest", {
 Vue.component("debug-handtest", {
 	template: `<div>
 
+		<div>test</div>
+		<div>test</div>
+		<div>test</div>
+		<div>test</div>
+		<div>test</div>
+		
+		<div v-for="v in app.hands.left.fingers[0].joints">
+			{{v}}
+
+		</div>
 	</div>`,
 	props: ["app", "sketch"]
 })
@@ -39,29 +49,23 @@ sketches["handtest"] = {
 
 	draw(p, t, dt) {
 		// p.background(0)
-		p.fill(0, 0, 100, 1)
-		p.rect(0, 0, p.width, p.height)
+		// p.fill(0, 0, 100, .1)
+		// p.rect(0, 0, p.width, p.height)
 
 		p.push()
-		p.translate(p.width/2, p.height/2)
-		app.hands.forEachHand((hand, handIndex) => {
-			p.noStroke()
-			p.fill(handIndex*100, 100, 50)
-			hand.data.forEach((v,vIndex) => {
-				// console.log(v)
-				p.circle(...v, 5)
-				p.fill(0)
-				p.text(vIndex, ...v)
-			})
+		// p.translate(p.width/2, p.height/2)
 
-			hand.data.slice(0,5).forEach(v => {
-				p.noFill()
-				p.circle(...v, 15)
-
-				p.fill(0)
-
-			})
-		})
+		// console.log(app.hands)
+		// app.hands.forEachHand((hand, handIndex) => {
+		// 	p.noStroke()
+		// 	p.fill(handIndex*100, 100, 50)
+		// 	hand.data.forEach((v,vIndex) => {
+		// 		// console.log(v)
+		// 		p.circle(...v, 50)
+		// 		p.fill(0)
+		// 		p.text(vIndex, ...v)
+		// 	})
+		// })
 
 		
 
@@ -71,35 +75,42 @@ sketches["handtest"] = {
 			// Draw as circles
 			hand.forEachFinger((finger, fingerIndex) => {
 				p.noStroke()
-				p.fill(fingerIndex*20 + 150*handIndex, 100, 50, .4)
 				finger.joints.forEach((joint, jointIndex) => {
-					joint.draw(p, 10)
+					for (var i = 0; i < 5; i++) {
+						let p2 = new Vector(joint)
+					
+						p.fill(fingerIndex*20 + 150*handIndex, 100, 50, .2)
+						joint.draw(p, 20)
+					}
+					
+					
 
 				})
-			}) 
-
-			// Draw as tube
-			hand.forEachFinger((finger, fingerIndex) => {
-				p.strokeWeight(10)
-				p.noFill()
-				p.stroke(fingerIndex*20 + 150*handIndex, 100, 50, 1)
-				p.beginShape()
-				finger.joints.forEach((joint, jointIndex) => {
-					joint.vertex(p)
-					// joint.draw(p, 10)
-				})
-				p.endShape()
-			}) 
-			p.noStroke()
-				
-			// Just fingertips
-			hand.forEachFinger((finger, fingerIndex) => {
-				p.noFill()
-				p.strokeWeight(1)
-				p.stroke(fingerIndex*20 + 150*handIndex, 100, 50, .4)
-				finger.fingerTip.draw(p, 50)
 			}) 
 		})
+
+		// 	// Draw as tube
+		// 	hand.forEachFinger((finger, fingerIndex) => {
+		// 		p.strokeWeight(10)
+		// 		p.noFill()
+		// 		p.stroke(fingerIndex*20 + 150*handIndex, 100, 50, 1)
+		// 		p.beginShape()
+		// 		finger.joints.forEach((joint, jointIndex) => {
+		// 			joint.vertex(p)
+		// 			// joint.draw(p, 10)
+		// 		})
+		// 		p.endShape()
+		// 	}) 
+		// 	p.noStroke()
+				
+		// 	// Just fingertips
+		// 	hand.forEachFinger((finger, fingerIndex) => {
+		// 		p.noFill()
+		// 		p.strokeWeight(1)
+		// 		p.stroke(fingerIndex*20 + 150*handIndex, 100, 50, .4)
+		// 		finger.fingerTip.draw(p, 50)
+		// 	}) 
+		// })
 
 		p.pop()
 	}
