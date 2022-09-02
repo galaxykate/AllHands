@@ -18,6 +18,7 @@ const canvasH = 480
 
 
 let app = {
+	handsfreeStatus: 0,
 	paused: false,
 
 	hands: new Hands(),
@@ -100,6 +101,7 @@ document.addEventListener("DOMContentLoaded", function(){
 		},
 
 		mounted() {
+
 			// Do lots of P5 setup
 			app.p5 = new p5((p) => {
 				// Save the noise fxn

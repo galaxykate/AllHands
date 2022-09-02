@@ -222,6 +222,9 @@
 		// Setting this vector
 
 		setTo() {
+			if (arguments[0] == undefined)
+				throw("Set vector to undefined")
+
 			// Deal with getting an array as an argument, rather than arg-style
 			let arr = Array.isArray(arguments[0])?arguments[0]:arguments
 			
@@ -242,10 +245,10 @@
 
 
 		setToLerp(v0, v1, pct) {
-			if (!Array.isArray(v0))
-				throw(`Non-array variable: '${v0}' type:${typeof v0}`)
-			if (!Array.isArray(v1))
-				throw(`Non-array variable: '${v1}' type:${typeof v1}`)
+			// if (!Array.isArray(v0))
+			// 	throw(`Non-array variable: '${v0}' type:${typeof v0}`)
+			// if (!Array.isArray(v1))
+			// 	throw(`Non-array variable: '${v1}' type:${typeof v1}`)
 			
 
 			for (var i = 0; i < Math.min(v0.length, v1.length); i++) {
@@ -255,6 +258,11 @@
 		}
 
 		setToDifference(v1, v0) {
+			// Deal with vectors
+			if (v0.v)
+				v0 = v0.v
+			if (v1.v)
+				v1 = v1.v
 			if (!Array.isArray(v0))
 				throw(`Non-array v0: '${v0}' type:${typeof v0}`)
 			if (!Array.isArray(v1))
@@ -268,11 +276,15 @@
 		}
 
 		setToMultiple(v, m) {
-			if (!Array.isArray(v))
-				throw(`Non-array v: '${v}' type:${typeof v}`)	
+			// if (!Array.isArray(v))
+			// 	throw(`Non-array v: '${v}' type:${typeof v}`)	
 			if (isNaN(m))
 				throw(`Non-number m: '${m}' type:${typeof m} `)
 			
+			// Deal with vectors
+			if (v.v)
+				v = v.v
+
 			for (var i = 0; i < v.length; i++) {
 				this.v[i] = v[i]*m			
 			}

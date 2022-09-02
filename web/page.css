@@ -90,6 +90,12 @@ header,footer {
 	width:  200px;
 }
 
+.handsfree-debugger {
+	position: absolute !important;
+	top:  0px;
+	right:  0px;
+}
+
 /*------------------------------------------------------------*/
 /*------------------------------------------------------------*/
 /* Format things?
