@@ -109,21 +109,24 @@ class Platform extends GameObject {
 	body
 	width
 	height
+	color
 
-	constructor(initX, initY, width, height, world) {
+	constructor(initX, initY, width, height, world, color, goal) {
 		var pl = planck, Vec2 = pl.Vec2;
 		super(initX, initY)
 		this.width = width
 		this.height = height
 		this.body = world.createBody()
-		this.body.createFixture(pl.Box(width*0.5, height*0.5))
+		this.body.createFixture(pl.Box(width*0.5, height*0.5), plat)
 		this.body.setPosition(Vec2(this.x + (width*0.5), this.y + (height*0.5)))
+		this.color = color 
+		this.goal = goal
 	}
 
 	draw(p) {
 		var dx = p.width / screenSpace.x
 		var dy = p.height / screenSpace.y 
-		p.fill(30)
+		p.fill(this.color)
 		p.rect(this.x * dx, this.y * dy, this.width * dx, this.height * dy)
 	}
 }
