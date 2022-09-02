@@ -8,6 +8,8 @@ class Finger {
 		for (var i = 0; i < 4; i++) {
 			this.joints[i] = new Vector(Math.random()*100, Math.random()*100)
 		}
+
+		this.fingerTip = this.joints[3]
 	}
 
 }

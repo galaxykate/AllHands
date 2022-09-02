@@ -92,6 +92,13 @@ sketches["handtest"] = {
 			}) 
 			p.noStroke()
 				
+			// Just fingertips
+			hand.forEachFinger((finger, fingerIndex) => {
+				p.noFill()
+				p.strokeWeight(1)
+				p.stroke(fingerIndex*20 + 150*handIndex, 100, 50, .4)
+				finger.fingerTip.draw(p, 50)
+			}) 
 		})
 
 		p.pop()
