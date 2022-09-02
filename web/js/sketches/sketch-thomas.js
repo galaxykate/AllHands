@@ -1,15 +1,15 @@
-Vue.component("controls-thomas", {
+Vue.component("controls-handball", {
 	template: `<div>MY TEST CONTROLS HERE</div>`,
 	props: ["app"]
 })
 
-Vue.component("debug-thomas", {
+Vue.component("debug-handball", {
 	template: `<div>MY TEST DEBUG HERE!!!!!</div>`,
 	props: ["app"]
 })
 
-sketches["thomas"] = {
-	id: "thomas",
+sketches["handball"] = {
+	id: "handball",
 	desc: "Small platformer",
 	gameObjects: [],
 	floor: {},
